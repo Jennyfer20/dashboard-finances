@@ -4,6 +4,17 @@
     box-sizing: border-box;
 }
 
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
+
+body.dashboard-body {
+    display: flex;
+    background-color: #f0f2f5;
+}
+
 /* === LANDING PAGE === */
 /* === LANDING PAGE === */
 .landing-body {
@@ -11,7 +22,18 @@
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     min-height: 100vh;
     color: white;
-    display: block;
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-body,
+.landing-body {
+    flex-direction: column;
+}
+
+.auth-body {
+    justify-content: center;
+    align-items: center;
 }
 
 .landing-nav {
