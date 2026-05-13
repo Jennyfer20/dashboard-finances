@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetLab - Connexion</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/favicon.png" type="image/png">
+</head>
+<body class="auth-body">
+
+    <div class="auth-box">
+        <h1 class="logo">BudgetLab</h1>
+        <h2>Connexion</h2>
+        <div class="formulaire">
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-mdp" placeholder="Mot de passe">
+            <button id="btn-login" class="btn-primary">Se connecter</button>
+            <p id="login-erreur" class="erreur"></p>
+        </div>
+        <p class="auth-link">Pas encore de compte ? <a href="/register">S'inscrire</a></p>
+    </div>
+
+    <script>
+    document.getElementById("btn-login").addEventListener("click", function() {
+        var email = document.getElementById("login-email").value;
+        var mdp = document.getElementById("login-mdp").value;
+        if (!email || !mdp) {
+            document.getElementById("login-erreur").textContent = "Remplis tous les champs !";
+            return;
+        }
+        fetch("/api/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email: email, mot_de_passe: mdp})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.succes) {
+                window.location.href = "/dashboard";
+            } else {
+                document.getElementById("login-erreur").textContent = data.erreur;
+            }
+        });
+    });
+    </script>
+
+</body>
+</html>

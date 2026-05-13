@@ -2,29 +2,31 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Mes Finances</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetLab - Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/favicon.png" type="image/png">
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>Mes Finances</h2>
+        <h2>💰 BudgetLab</h2>
         <a href="#" class="active" onclick="changerPage('dashboard')">Tableau de bord</a>
         <a href="#" onclick="changerPage('transactions')">Transactions</a>
-        <a href="#" onclick="changerPage('parametres')">Parametres</a>
+        <a href="/api/logout" class="logout-link">Deconnexion</a>
     </div>
 
     <div class="main">
 
         <div class="header">
-            <h1 id="titre-page">Tableau de bord</h1>
+            <h1 id="titre-page">Bonjour, {{ user_nom }} 👋</h1>
             <div class="theme-buttons">
                 <button id="btn-clair" class="btn-actif">Mode Clair</button>
                 <button id="btn-sombre">Mode Sombre</button>
             </div>
         </div>
 
-        <!-- PAGE 1 : DASHBOARD -->
+        <!-- PAGE DASHBOARD -->
         <div id="page-dashboard" class="page">
             <div class="cartes">
                 <div class="carte carte-solde">
@@ -66,23 +68,24 @@
             </div>
         </div>
 
-        <!-- PAGE 2 : TRANSACTIONS -->
+        <!-- PAGE TRANSACTIONS -->
         <div id="page-transactions" class="page" style="display:none;">
+            <div class="filtres">
+                <select id="filtre-categorie">
+                    <option value="">Toutes les categories</option>
+                </select>
+                <input type="date" id="filtre-date-debut" placeholder="Date debut">
+                <input type="date" id="filtre-date-fin" placeholder="Date fin">
+                <button id="btn-filtrer">Filtrer</button>
+                <button id="btn-reset" class="btn-secondary">Reset</button>
+            </div>
             <div class="section-transactions">
                 <h3>Toutes les transactions</h3>
                 <div id="liste-transactions">Chargement...</div>
             </div>
         </div>
 
-        <!-- PAGE 3 : PARAMETRES -->
-        <div id="page-parametres" class="page" style="display:none;">
-            <div class="section-transactions">
-                <h3>Parametres</h3>
-                <p style="color:#64748b; margin-top:10px;">Les parametres arrivent bientot !</p>
-            </div>
-        </div>
-
-        <!-- POPUP DE MODIFICATION (cache par defaut) -->
+        <!-- POPUP MODIFIER -->
         <div id="popup-modifier" class="popup-overlay" style="display:none;">
             <div class="popup-box">
                 <h3>Modifier la transaction</h3>

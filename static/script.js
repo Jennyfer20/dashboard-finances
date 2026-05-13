@@ -1,38 +1,22 @@
-// === Fonction pour changer de page ===
 function changerPage(page) {
-    // Cacher toutes les pages
     var pages = document.querySelectorAll(".page");
-    pages.forEach(function (p) {
-        p.style.display = "none";
-    });
-
-    // Afficher la page demandee
+    pages.forEach(function (p) { p.style.display = "none"; });
     document.getElementById("page-" + page).style.display = "block";
 
-    // Mettre a jour le titre
-    var titres = {
-        "dashboard": "Tableau de bord",
-        "transactions": "Transactions",
-        "parametres": "Parametres"
-    };
-    document.getElementById("titre-page").textContent = titres[page];
-
-    // Mettre a jour le lien actif dans la sidebar
     var liens = document.querySelectorAll(".sidebar a");
-    liens.forEach(function (lien) {
-        lien.classList.remove("active");
-    });
+    liens.forEach(function (lien) { lien.classList.remove("active"); });
     event.target.classList.add("active");
+
+    if (page === "transactions") {
+        chargerCategories();
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
 
     var graphiqueDepenses = null;
 
-    // === Fonction pour charger tout ===
     function chargerDonnees() {
-
-        // 1. Charger le resume (cartes)
         fetch("/api/resume")
             .then(function (r) { return r.json(); })
             .then(function (data) {
@@ -42,47 +26,58 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("val-transactions").textContent = data.nb_transactions;
             });
 
-        // 2. Charger le graphique
         fetch("/api/depenses-par-categorie")
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 var ctx = document.getElementById("graphique-depenses").getContext("2d");
-
-                if (graphiqueDepenses) {
-                    graphiqueDepenses.destroy();
-                }
-
+                if (graphiqueDepenses) { graphiqueDepenses.destroy(); }
                 graphiqueDepenses = new Chart(ctx, {
                     type: "doughnut",
                     data: {
                         labels: data.labels,
-                        datasets: [{
-                            data: data.valeurs,
-                            backgroundColor: ["#ef4444", "#f59e0b", "#3b82f6", "#10b981", "#8b5cf6"]
-                        }]
+                        datasets: [{ data: data.valeurs, backgroundColor: ["#ef4444", "#f59e0b", "#3b82f6", "#10b981", "#8b5cf6", "#ec4899"] }]
                     },
                     options: { responsive: true }
                 });
             });
 
-        // 3. Charger la liste des transactions
-        fetch("/api/transactions")
+        chargerTransactions();
+    }
+
+    // Charger les transactions avec filtres
+    window.chargerTransactions = function (filtres) {
+        var url = "/api/transactions";
+        if (filtres) {
+            var params = [];
+            if (filtres.categorie) params.push("categorie=" + filtres.categorie);
+            if (filtres.date_debut) params.push("date_debut=" + filtres.date_debut);
+            if (filtres.date_fin) params.push("date_fin=" + filtres.date_fin);
+            if (params.length > 0) url += "?" + params.join("&");
+        }
+
+        fetch(url)
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 var container = document.getElementById("liste-transactions");
                 container.innerHTML = "";
 
+                if (data.length === 0) {
+                    container.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:20px;">Aucune transaction trouvee</p>';
+                    return;
+                }
+
                 data.forEach(function (t) {
                     var div = document.createElement("div");
                     div.className = "transaction-item";
-
                     var signe = t.type === "revenu" ? "+" : "-";
                     var classe = t.type === "revenu" ? "montant-revenu" : "montant-depense";
+                    var dateStr = t.date_ajout || "";
 
                     div.innerHTML =
                         '<div class="transaction-info">' +
                         '<span class="transaction-desc">' + t.description + '</span>' +
                         '<span class="transaction-cat">' + t.categorie + '</span>' +
+                        '<span class="transaction-date">' + dateStr + '</span>' +
                         '</div>' +
                         '<span class="' + classe + '">' + signe + t.montant.toLocaleString() + ' FCFA</span>' +
                         '<div class="transaction-actions">' +
@@ -93,7 +88,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     container.appendChild(div);
                 });
 
-                // Ajouter les evenements sur les boutons Modifier
                 document.querySelectorAll(".btn-modifier").forEach(function (btn) {
                     btn.addEventListener("click", function () {
                         document.getElementById("edit-id").value = btn.dataset.id;
@@ -105,49 +99,45 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                 });
 
-                // Ajouter les evenements sur les boutons Supprimer
                 document.querySelectorAll(".btn-supprimer").forEach(function (btn) {
                     btn.addEventListener("click", function () {
                         if (confirm("Es-tu sur de vouloir supprimer cette transaction ?")) {
-                            fetch("/api/supprimer/" + btn.dataset.id, {
-                                method: "DELETE"
-                            })
+                            fetch("/api/supprimer/" + btn.dataset.id, { method: "DELETE" })
                                 .then(function (r) { return r.json(); })
-                                .then(function (data) {
-                                    if (data.succes) {
-                                        chargerDonnees();
-                                    }
-                                });
+                                .then(function (data) { if (data.succes) chargerDonnees(); });
                         }
                     });
                 });
             });
-    }
+    };
 
-    // Charger les donnees au demarrage
+    // Charger les categories pour le filtre
+    window.chargerCategories = function () {
+        fetch("/api/categories")
+            .then(function (r) { return r.json(); })
+            .then(function (cats) {
+                var select = document.getElementById("filtre-categorie");
+                select.innerHTML = '<option value="">Toutes les categories</option>';
+                cats.forEach(function (cat) {
+                    select.innerHTML += '<option value="' + cat + '">' + cat + '</option>';
+                });
+            });
+    };
+
     chargerDonnees();
 
-    // === Bouton Ajouter ===
+    // Bouton Ajouter
     document.getElementById("btn-ajouter").addEventListener("click", function () {
         var type = document.getElementById("form-type").value;
         var categorie = document.getElementById("form-categorie").value;
         var montant = document.getElementById("form-montant").value;
         var description = document.getElementById("form-description").value;
-
-        if (!categorie || !montant || !description) {
-            alert("Remplis tous les champs !");
-            return;
-        }
+        if (!categorie || !montant || !description) { alert("Remplis tous les champs !"); return; }
 
         fetch("/api/ajouter", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                type: type,
-                categorie: categorie,
-                montant: montant,
-                description: description
-            })
+            body: JSON.stringify({ type: type, categorie: categorie, montant: montant, description: description })
         })
             .then(function (r) { return r.json(); })
             .then(function (data) {
@@ -160,22 +150,34 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // === Bouton Sauvegarder (popup modifier) ===
+    // Bouton Filtrer
+    document.getElementById("btn-filtrer").addEventListener("click", function () {
+        chargerTransactions({
+            categorie: document.getElementById("filtre-categorie").value,
+            date_debut: document.getElementById("filtre-date-debut").value,
+            date_fin: document.getElementById("filtre-date-fin").value
+        });
+    });
+
+    // Bouton Reset
+    document.getElementById("btn-reset").addEventListener("click", function () {
+        document.getElementById("filtre-categorie").value = "";
+        document.getElementById("filtre-date-debut").value = "";
+        document.getElementById("filtre-date-fin").value = "";
+        chargerTransactions();
+    });
+
+    // Bouton Sauvegarder
     document.getElementById("btn-sauvegarder").addEventListener("click", function () {
         var id = document.getElementById("edit-id").value;
-        var type = document.getElementById("edit-type").value;
-        var categorie = document.getElementById("edit-categorie").value;
-        var montant = document.getElementById("edit-montant").value;
-        var description = document.getElementById("edit-description").value;
-
         fetch("/api/modifier/" + id, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                type: type,
-                categorie: categorie,
-                montant: montant,
-                description: description
+                type: document.getElementById("edit-type").value,
+                categorie: document.getElementById("edit-categorie").value,
+                montant: document.getElementById("edit-montant").value,
+                description: document.getElementById("edit-description").value
             })
         })
             .then(function (r) { return r.json(); })
@@ -187,25 +189,22 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // === Bouton Annuler (popup modifier) ===
+    // Bouton Annuler
     document.getElementById("btn-annuler").addEventListener("click", function () {
         document.getElementById("popup-modifier").style.display = "none";
     });
 
-    // === Boutons Mode Clair / Sombre ===
-    var btnClair = document.getElementById("btn-clair");
-    var btnSombre = document.getElementById("btn-sombre");
-
-    btnSombre.addEventListener("click", function () {
+    // Mode sombre
+    document.getElementById("btn-sombre").addEventListener("click", function () {
         document.body.classList.add("dark");
-        btnSombre.classList.add("btn-actif");
-        btnClair.classList.remove("btn-actif");
+        document.getElementById("btn-sombre").classList.add("btn-actif");
+        document.getElementById("btn-clair").classList.remove("btn-actif");
     });
 
-    btnClair.addEventListener("click", function () {
+    document.getElementById("btn-clair").addEventListener("click", function () {
         document.body.classList.remove("dark");
-        btnClair.classList.add("btn-actif");
-        btnSombre.classList.remove("btn-actif");
+        document.getElementById("btn-clair").classList.add("btn-actif");
+        document.getElementById("btn-sombre").classList.remove("btn-actif");
     });
 
 });

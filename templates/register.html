@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetLab - Inscription</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/favicon.png" type="image/png">
+</head>
+<body class="auth-body">
+
+    <div class="auth-box">
+        <h1 class="logo">BudgetLab</h1>
+        <h2>Creer un compte</h2>
+        <div class="formulaire">
+            <input type="text" id="reg-nom" placeholder="Ton nom">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-mdp" placeholder="Mot de passe">
+            <input type="password" id="reg-mdp2" placeholder="Confirmer le mot de passe">
+            <button id="btn-register" class="btn-primary">S'inscrire</button>
+            <p id="reg-erreur" class="erreur"></p>
+        </div>
+        <p class="auth-link">Deja un compte ? <a href="/login">Se connecter</a></p>
+    </div>
+
+    <script>
+    document.getElementById("btn-register").addEventListener("click", function() {
+        var nom = document.getElementById("reg-nom").value;
+        var email = document.getElementById("reg-email").value;
+        var mdp = document.getElementById("reg-mdp").value;
+        var mdp2 = document.getElementById("reg-mdp2").value;
+        if (!nom || !email || !mdp || !mdp2) {
+            document.getElementById("reg-erreur").textContent = "Remplis tous les champs !";
+            return;
+        }
+        if (mdp !== mdp2) {
+            document.getElementById("reg-erreur").textContent = "Les mots de passe ne correspondent pas !";
+            return;
+        }
+        fetch("/api/register", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({nom: nom, email: email, mot_de_passe: mdp})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.succes) {
+                window.location.href = "/dashboard";
+            } else {
+                document.getElementById("reg-erreur").textContent = data.erreur;
+            }
+        });
+    });
+    </script>
+
+</body>
+</html>
