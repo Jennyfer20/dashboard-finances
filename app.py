@@ -1,17 +1,24 @@
-from flask import Flask, render_template, jsonify, request
+﻿from flask import Flask, render_template, jsonify, request
+import sqlite3
 
 app = Flask(__name__)
 
-transactions = [
-    {"id": 1, "type": "revenu", "categorie": "Salaire", "montant": 150000, "description": "Salaire Janvier"},
-    {"id": 2, "type": "depense", "categorie": "Nourriture", "montant": 25000, "description": "Courses semaine"},
-    {"id": 3, "type": "depense", "categorie": "Transport", "montant": 10000, "description": "Bus mensuel"},
-    {"id": 4, "type": "depense", "categorie": "Loisirs", "montant": 15000, "description": "Sortie resto"},
-    {"id": 5, "type": "revenu", "categorie": "Freelance", "montant": 50000, "description": "Projet web"},
-    {"id": 6, "type": "depense", "categorie": "Factures", "montant": 30000, "description": "Electricite"},
-]
+def get_db():
+    conn = sqlite3.connect("finances.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
-prochain_id = 7
+def init_db():
+    conn = get_db()
+    conn.execute("""CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT NOT NULL, categorie TEXT NOT NULL, montant INTEGER NOT NULL, description TEXT NOT NULL, date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    count = conn.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
+    if count == 0:
+        demos = [("revenu","Salaire",150000,"Salaire Janvier"),("depense","Nourriture",25000,"Courses semaine"),("depense","Transport",10000,"Bus mensuel"),("depense","Loisirs",15000,"Sortie resto"),("revenu","Freelance",50000,"Projet web"),("depense","Factures",30000,"Electricite")]
+        conn.executemany("INSERT INTO transactions (type,categorie,montant,description) VALUES (?,?,?,?)", demos)
+    conn.commit()
+    conn.close()
+
+init_db()
 
 @app.route("/")
 def accueil():
@@ -19,70 +26,52 @@ def accueil():
 
 @app.route("/api/resume")
 def resume():
-    total_revenus = sum(t["montant"] for t in transactions if t["type"] == "revenu")
-    total_depenses = sum(t["montant"] for t in transactions if t["type"] == "depense")
-    solde = total_revenus - total_depenses
-    nb_transactions = len(transactions)
-    return jsonify({
-        "revenus": total_revenus,
-        "depenses": total_depenses,
-        "solde": solde,
-        "nb_transactions": nb_transactions
-    })
+    conn = get_db()
+    revenus = conn.execute("SELECT COALESCE(SUM(montant),0) FROM transactions WHERE type='revenu'").fetchone()[0]
+    depenses = conn.execute("SELECT COALESCE(SUM(montant),0) FROM transactions WHERE type='depense'").fetchone()[0]
+    nb = conn.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
+    conn.close()
+    return jsonify({"revenus":revenus,"depenses":depenses,"solde":revenus-depenses,"nb_transactions":nb})
 
 @app.route("/api/depenses-par-categorie")
 def depenses_par_categorie():
-    categories = {}
-    for t in transactions:
-        if t["type"] == "depense":
-            cat = t["categorie"]
-            if cat in categories:
-                categories[cat] += t["montant"]
-            else:
-                categories[cat] = t["montant"]
-    return jsonify({
-        "labels": list(categories.keys()),
-        "valeurs": list(categories.values())
-    })
+    conn = get_db()
+    rows = conn.execute("SELECT categorie, SUM(montant) as total FROM transactions WHERE type='depense' GROUP BY categorie").fetchall()
+    conn.close()
+    return jsonify({"labels":[r["categorie"] for r in rows],"valeurs":[r["total"] for r in rows]})
 
 @app.route("/api/transactions")
 def liste_transactions():
-    return jsonify(transactions)
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM transactions ORDER BY id DESC").fetchall()
+    conn.close()
+    return jsonify([{"id":r["id"],"type":r["type"],"categorie":r["categorie"],"montant":r["montant"],"description":r["description"]} for r in rows])
 
 @app.route("/api/ajouter", methods=["POST"])
 def ajouter():
-    global prochain_id
     data = request.get_json()
-    nouvelle = {
-        "id": prochain_id,
-        "type": data["type"],
-        "categorie": data["categorie"],
-        "montant": int(data["montant"]),
-        "description": data["description"]
-    }
-    transactions.append(nouvelle)
-    prochain_id += 1
-    return jsonify({"succes": True})
+    conn = get_db()
+    conn.execute("INSERT INTO transactions (type,categorie,montant,description) VALUES (?,?,?,?)", (data["type"],data["categorie"],int(data["montant"]),data["description"]))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes":True})
 
-# NOUVEAU : modifier une transaction
 @app.route("/api/modifier/<int:id>", methods=["PUT"])
 def modifier(id):
     data = request.get_json()
-    for t in transactions:
-        if t["id"] == id:
-            t["type"] = data["type"]
-            t["categorie"] = data["categorie"]
-            t["montant"] = int(data["montant"])
-            t["description"] = data["description"]
-            return jsonify({"succes": True})
-    return jsonify({"succes": False, "erreur": "Transaction introuvable"})
+    conn = get_db()
+    conn.execute("UPDATE transactions SET type=?,categorie=?,montant=?,description=? WHERE id=?", (data["type"],data["categorie"],int(data["montant"]),data["description"],id))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes":True})
 
-# NOUVEAU : supprimer une transaction
 @app.route("/api/supprimer/<int:id>", methods=["DELETE"])
 def supprimer(id):
-    global transactions
-    transactions = [t for t in transactions if t["id"] != id]
-    return jsonify({"succes": True})
+    conn = get_db()
+    conn.execute("DELETE FROM transactions WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes":True})
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=5000)
