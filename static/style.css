@@ -5,11 +5,13 @@
 }
 
 /* === LANDING PAGE === */
+/* === LANDING PAGE === */
 .landing-body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     min-height: 100vh;
     color: white;
+    display: block;
 }
 
 .landing-nav {
@@ -19,8 +21,9 @@
     padding: 20px 40px;
 }
 
-.logo {
-    font-size: 26px;
+.nav-logo {
+    font-size: 20px;
+    font-weight: bold;
     color: #3b82f6;
 }
 
@@ -63,35 +66,26 @@
     font-size: 18px;
 }
 
-.landing-hero {
+.landing-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.big-title {
+    font-size: 64px;
+    color: #3b82f6;
+    margin-bottom: 50px;
     text-align: center;
-    padding: 80px 20px 60px;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.landing-hero h1 {
-    font-size: 48px;
-    margin-bottom: 20px;
-    line-height: 1.2;
-}
-
-.landing-hero p {
-    font-size: 18px;
-    color: #94a3b8;
-    margin-bottom: 40px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .landing-features {
     display: flex;
     justify-content: center;
     gap: 30px;
-    padding: 40px 20px;
+    margin-bottom: 50px;
     max-width: 900px;
-    margin: 0 auto;
     flex-wrap: wrap;
 }
 
@@ -101,6 +95,7 @@
     border-radius: 12px;
     text-align: center;
     flex: 1;
+    min-width: 200px;
 }
 
 .feature-icon {
@@ -116,6 +111,26 @@
 .feature p {
     color: #94a3b8;
     font-size: 14px;
+}
+
+.landing-cta {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 30px 40px;
+    border-radius: 12px;
+    max-width: 700px;
+}
+
+.landing-cta p {
+    color: #94a3b8;
+    font-size: 16px;
+    flex: 1;
+}
+
+.landing-cta .btn-large {
+    white-space: nowrap;
 }
 
 /* === AUTH PAGES (login/register) === */
@@ -633,35 +648,28 @@ body.dark .theme-buttons button.btn-actif {
 @media (max-width: 768px) {
 
     /* Landing */
-    .landing-nav {
-        padding: 15px 20px;
-    }
-
-    .landing-hero {
-        padding: 50px 20px 40px;
-    }
-
-    .landing-hero h1 {
-        font-size: 30px;
-    }
-
-    .landing-hero p {
-        font-size: 15px;
+    .big-title {
+        font-size: 36px;
+        margin-bottom: 30px;
     }
 
     .landing-features {
         flex-direction: column;
-        padding: 20px;
         gap: 15px;
     }
 
     .feature {
+        min-width: auto;
+    }
+
+    .landing-cta {
+        flex-direction: column;
+        text-align: center;
         padding: 20px;
     }
 
-    .auth-box {
-        width: 90%;
-        padding: 25px;
+    .landing-nav {
+        padding: 15px 20px;
     }
 
     /* Dashboard */
@@ -770,6 +778,10 @@ body.dark .theme-buttons button.btn-actif {
 
     .header h1 {
         font-size: 16px;
+    }
+
+    .big-title {
+        font-size: 28px;
     }
 }
 
