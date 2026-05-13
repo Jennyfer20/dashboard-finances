@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Finances</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Mes Finances</h2>
+        <a href="#" class="active" onclick="changerPage('dashboard')">Tableau de bord</a>
+        <a href="#" onclick="changerPage('transactions')">Transactions</a>
+        <a href="#" onclick="changerPage('parametres')">Parametres</a>
+    </div>
+
+    <div class="main">
+
+        <div class="header">
+            <h1 id="titre-page">Tableau de bord</h1>
+            <div class="theme-buttons">
+                <button id="btn-clair" class="btn-actif">Mode Clair</button>
+                <button id="btn-sombre">Mode Sombre</button>
+            </div>
+        </div>
+
+        <!-- PAGE 1 : DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="cartes">
+                <div class="carte carte-solde">
+                    <h3>Solde</h3>
+                    <p id="val-solde">Chargement...</p>
+                </div>
+                <div class="carte carte-revenus">
+                    <h3>Revenus</h3>
+                    <p id="val-revenus">Chargement...</p>
+                </div>
+                <div class="carte carte-depenses">
+                    <h3>Depenses</h3>
+                    <p id="val-depenses">Chargement...</p>
+                </div>
+                <div class="carte carte-transactions">
+                    <h3>Transactions</h3>
+                    <p id="val-transactions">Chargement...</p>
+                </div>
+            </div>
+
+            <div class="graphiques">
+                <div class="graphique-box">
+                    <h3>Depenses par categorie</h3>
+                    <canvas id="graphique-depenses"></canvas>
+                </div>
+                <div class="graphique-box formulaire-box">
+                    <h3>Ajouter une transaction</h3>
+                    <div class="formulaire">
+                        <select id="form-type">
+                            <option value="depense">Depense</option>
+                            <option value="revenu">Revenu</option>
+                        </select>
+                        <input type="text" id="form-categorie" placeholder="Categorie (ex: Nourriture)">
+                        <input type="number" id="form-montant" placeholder="Montant (FCFA)">
+                        <input type="text" id="form-description" placeholder="Description">
+                        <button id="btn-ajouter">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2 : TRANSACTIONS -->
+        <div id="page-transactions" class="page" style="display:none;">
+            <div class="section-transactions">
+                <h3>Toutes les transactions</h3>
+                <div id="liste-transactions">Chargement...</div>
+            </div>
+        </div>
+
+        <!-- PAGE 3 : PARAMETRES -->
+        <div id="page-parametres" class="page" style="display:none;">
+            <div class="section-transactions">
+                <h3>Parametres</h3>
+                <p style="color:#64748b; margin-top:10px;">Les parametres arrivent bientot !</p>
+            </div>
+        </div>
+
+        <!-- POPUP DE MODIFICATION (cache par defaut) -->
+        <div id="popup-modifier" class="popup-overlay" style="display:none;">
+            <div class="popup-box">
+                <h3>Modifier la transaction</h3>
+                <div class="formulaire">
+                    <input type="hidden" id="edit-id">
+                    <select id="edit-type">
+                        <option value="depense">Depense</option>
+                        <option value="revenu">Revenu</option>
+                    </select>
+                    <input type="text" id="edit-categorie" placeholder="Categorie">
+                    <input type="number" id="edit-montant" placeholder="Montant (FCFA)">
+                    <input type="text" id="edit-description" placeholder="Description">
+                    <div class="popup-buttons">
+                        <button id="btn-sauvegarder">Sauvegarder</button>
+                        <button id="btn-annuler" class="btn-secondary">Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>
