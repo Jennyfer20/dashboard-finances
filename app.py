@@ -36,29 +36,24 @@ init_db()
 def hash_mdp(mot_de_passe):
     return hashlib.sha256(mot_de_passe.encode()).hexdigest()
 
-# Page d'accueil (landing page)
 @app.route("/")
 def landing():
     return render_template("landing.html")
 
-# Page de connexion
 @app.route("/login")
 def login_page():
     return render_template("login.html")
 
-# Page d'inscription
 @app.route("/register")
 def register_page():
     return render_template("register.html")
 
-# Dashboard (protege)
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session:
         return redirect("/login")
     return render_template("index.html", user_nom=session["user_nom"])
 
-# API : inscription
 @app.route("/api/register", methods=["POST"])
 def api_register():
     data = request.get_json()
@@ -78,7 +73,6 @@ def api_register():
         conn.close()
         return jsonify({"succes": False, "erreur": "Cet email existe deja"})
 
-# API : connexion
 @app.route("/api/login", methods=["POST"])
 def api_login():
     data = request.get_json()
@@ -94,13 +88,11 @@ def api_login():
         return jsonify({"succes": True})
     return jsonify({"succes": False, "erreur": "Email ou mot de passe incorrect"})
 
-# API : deconnexion
 @app.route("/api/logout")
 def api_logout():
     session.clear()
     return redirect("/")
 
-# API : resume
 @app.route("/api/resume")
 def resume():
     if "user_id" not in session:
@@ -113,7 +105,6 @@ def resume():
     conn.close()
     return jsonify({"revenus":revenus,"depenses":depenses,"solde":revenus-depenses,"nb_transactions":nb})
 
-# API : depenses par categorie
 @app.route("/api/depenses-par-categorie")
 def depenses_par_categorie():
     if "user_id" not in session:
@@ -123,7 +114,6 @@ def depenses_par_categorie():
     conn.close()
     return jsonify({"labels":[r["categorie"] for r in rows],"valeurs":[r["total"] for r in rows]})
 
-# API : transactions avec filtres
 @app.route("/api/transactions")
 def liste_transactions():
     if "user_id" not in session:
@@ -149,7 +139,6 @@ def liste_transactions():
     conn.close()
     return jsonify([{"id":r["id"],"type":r["type"],"categorie":r["categorie"],"montant":r["montant"],"description":r["description"],"date_ajout":r["date_ajout"]} for r in rows])
 
-# API : categories disponibles
 @app.route("/api/categories")
 def categories():
     if "user_id" not in session:
@@ -159,7 +148,6 @@ def categories():
     conn.close()
     return jsonify([r["categorie"] for r in rows])
 
-# API : ajouter
 @app.route("/api/ajouter", methods=["POST"])
 def ajouter():
     if "user_id" not in session:
@@ -171,7 +159,6 @@ def ajouter():
     conn.close()
     return jsonify({"succes":True})
 
-# API : modifier
 @app.route("/api/modifier/<int:id>", methods=["PUT"])
 def modifier(id):
     if "user_id" not in session:
@@ -183,7 +170,6 @@ def modifier(id):
     conn.close()
     return jsonify({"succes":True})
 
-# API : supprimer
 @app.route("/api/supprimer/<int:id>", methods=["DELETE"])
 def supprimer(id):
     if "user_id" not in session:

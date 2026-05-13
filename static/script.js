@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
         chargerTransactions();
     }
 
-    // Charger les transactions avec filtres
     window.chargerTransactions = function (filtres) {
         var url = "/api/transactions";
         if (filtres) {
@@ -111,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
-    // Charger les categories pour le filtre
     window.chargerCategories = function () {
         fetch("/api/categories")
             .then(function (r) { return r.json(); })
@@ -126,7 +124,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     chargerDonnees();
 
-    // Bouton Ajouter
     document.getElementById("btn-ajouter").addEventListener("click", function () {
         var type = document.getElementById("form-type").value;
         var categorie = document.getElementById("form-categorie").value;
@@ -150,7 +147,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // Bouton Filtrer
     document.getElementById("btn-filtrer").addEventListener("click", function () {
         chargerTransactions({
             categorie: document.getElementById("filtre-categorie").value,
@@ -159,7 +155,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Bouton Reset
     document.getElementById("btn-reset").addEventListener("click", function () {
         document.getElementById("filtre-categorie").value = "";
         document.getElementById("filtre-date-debut").value = "";
@@ -167,7 +162,6 @@ document.addEventListener("DOMContentLoaded", function () {
         chargerTransactions();
     });
 
-    // Bouton Sauvegarder
     document.getElementById("btn-sauvegarder").addEventListener("click", function () {
         var id = document.getElementById("edit-id").value;
         fetch("/api/modifier/" + id, {
@@ -189,12 +183,10 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // Bouton Annuler
     document.getElementById("btn-annuler").addEventListener("click", function () {
         document.getElementById("popup-modifier").style.display = "none";
     });
 
-    // Mode sombre
     document.getElementById("btn-sombre").addEventListener("click", function () {
         document.body.classList.add("dark");
         document.getElementById("btn-sombre").classList.add("btn-actif");
