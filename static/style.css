@@ -38,6 +38,7 @@
     text-decoration: none;
     font-size: 14px;
     display: inline-block;
+    transition: all 0.2s;
 }
 
 .btn-outline:hover {
@@ -55,6 +56,7 @@
     font-size: 14px;
     cursor: pointer;
     display: inline-block;
+    transition: all 0.2s;
 }
 
 .btn-primary:hover {
@@ -96,6 +98,14 @@
     text-align: center;
     flex: 1;
     min-width: 200px;
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.feature:hover {
+    transform: translateY(-10px);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
 }
 
 .feature-icon {
@@ -184,6 +194,26 @@
     margin-top: 5px;
 }
 
+/* === PASSWORD TOGGLE === */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 45px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    user-select: none;
+}
+
 /* === DASHBOARD === */
 .dashboard-body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -213,8 +243,9 @@
     color: #94a3b8;
     text-decoration: none;
     padding: 10px 0;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
+    transition: color 0.2s;
 }
 
 .sidebar a:hover,
@@ -266,6 +297,7 @@
     color: #64748b;
     font-size: 13px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
 .theme-buttons button.btn-actif {
@@ -287,6 +319,7 @@
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-top: 4px solid #94a3b8;
+    transition: transform 0.2s;
 }
 
 .carte h3 {
@@ -319,7 +352,6 @@
 
 .carte:hover {
     transform: translateY(-5px);
-    transition: transform 0.2s;
     cursor: pointer;
 }
 
@@ -349,6 +381,12 @@
     gap: 12px;
 }
 
+.formulaire label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: bold;
+}
+
 .formulaire select,
 .formulaire input {
     padding: 12px;
@@ -373,6 +411,7 @@
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 #btn-ajouter:hover {
@@ -482,6 +521,7 @@
     color: #3b82f6;
     font-size: 12px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
 .btn-modifier:hover {
@@ -497,6 +537,7 @@
     color: #ef4444;
     font-size: 12px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
 .btn-supprimer:hover {
@@ -504,6 +545,65 @@
     color: white;
 }
 
+/* === SETTINGS === */
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.settings-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-card h3 {
+    color: #1e293b;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.msg {
+    font-size: 13px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.danger-zone {
+    grid-column: 1 / -1;
+    border: 2px solid #ef4444;
+    background-color: #fef2f2;
+}
+
+.danger-zone h3 {
+    color: #ef4444;
+}
+
+.danger-zone p {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.btn-danger {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+/* === POPUP === */
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -611,6 +711,10 @@
     color: #f1f5f9;
 }
 
+.dashboard-body.dark .formulaire label {
+    color: #94a3b8;
+}
+
 .dashboard-body.dark .filtres select,
 .dashboard-body.dark .filtres input {
     background-color: #1e293b;
@@ -643,6 +747,24 @@
 .dashboard-body.dark .theme-buttons button.btn-actif {
     background-color: #1e293b;
     color: #f1f5f9;
+}
+
+.dashboard-body.dark .settings-card {
+    background-color: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-body.dark .settings-card h3 {
+    color: #f1f5f9;
+}
+
+.dashboard-body.dark .danger-zone {
+    background-color: #1e293b;
+    border-color: #ef4444;
+}
+
+.dashboard-body.dark .danger-zone p {
+    color: #94a3b8;
 }
 
 /* === RESPONSIVE === */
@@ -698,7 +820,7 @@
     .sidebar a {
         padding: 5px 8px;
         white-space: nowrap;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .logout-link {
@@ -752,6 +874,10 @@
 
     .transaction-actions {
         margin-left: 0;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
     }
 }
 

@@ -15,8 +15,14 @@
         <div class="formulaire">
             <input type="text" id="reg-nom" placeholder="Ton nom">
             <input type="email" id="reg-email" placeholder="Email">
-            <input type="password" id="reg-mdp" placeholder="Mot de passe">
-            <input type="password" id="reg-mdp2" placeholder="Confirmer le mot de passe">
+            <div class="password-field">
+                <input type="password" id="reg-mdp" placeholder="Mot de passe">
+                <span class="toggle-password" onclick="togglePassword('reg-mdp', this)">👁️</span>
+            </div>
+            <div class="password-field">
+                <input type="password" id="reg-mdp2" placeholder="Confirmer le mot de passe">
+                <span class="toggle-password" onclick="togglePassword('reg-mdp2', this)">👁️</span>
+            </div>
             <button id="btn-register" class="btn-primary">S'inscrire</button>
             <p id="reg-erreur" class="erreur"></p>
         </div>
@@ -24,6 +30,17 @@
     </div>
 
     <script>
+    function togglePassword(inputId, icon) {
+        var input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "🙈";
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️";
+        }
+    }
+
     document.getElementById("btn-register").addEventListener("click", function() {
         var nom = document.getElementById("reg-nom").value;
         var email = document.getElementById("reg-email").value;

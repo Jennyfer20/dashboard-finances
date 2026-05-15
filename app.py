@@ -93,6 +93,60 @@ def api_logout():
     session.clear()
     return redirect("/")
 
+@app.route("/api/profil")
+def profil():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    conn = get_db()
+    user = conn.execute("SELECT nom, email FROM users WHERE id=?", (session["user_id"],)).fetchone()
+    conn.close()
+    return jsonify({"nom": user["nom"], "email": user["email"]})
+
+@app.route("/api/profil/modifier", methods=["PUT"])
+def modifier_profil():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    data = request.get_json()
+    conn = get_db()
+    try:
+        conn.execute("UPDATE users SET nom=?, email=? WHERE id=?",
+            (data["nom"], data["email"], session["user_id"]))
+        conn.commit()
+        session["user_nom"] = data["nom"]
+        conn.close()
+        return jsonify({"succes": True})
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({"succes": False, "erreur": "Cet email est deja utilise"})
+
+@app.route("/api/profil/mot-de-passe", methods=["PUT"])
+def changer_mdp():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    data = request.get_json()
+    conn = get_db()
+    user = conn.execute("SELECT mot_de_passe FROM users WHERE id=?", (session["user_id"],)).fetchone()
+    if user["mot_de_passe"] != hash_mdp(data["ancien"]):
+        conn.close()
+        return jsonify({"succes": False, "erreur": "Ancien mot de passe incorrect"})
+    conn.execute("UPDATE users SET mot_de_passe=? WHERE id=?",
+        (hash_mdp(data["nouveau"]), session["user_id"]))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes": True})
+
+@app.route("/api/profil/supprimer", methods=["DELETE"])
+def supprimer_compte():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    conn = get_db()
+    conn.execute("DELETE FROM transactions WHERE user_id=?", (session["user_id"],))
+    conn.execute("DELETE FROM users WHERE id=?", (session["user_id"],))
+    conn.commit()
+    conn.close()
+    session.clear()
+    return jsonify({"succes": True})
+
 @app.route("/api/resume")
 def resume():
     if "user_id" not in session:

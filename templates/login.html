@@ -14,7 +14,10 @@
         <h2>Connexion</h2>
         <div class="formulaire">
             <input type="email" id="login-email" placeholder="Email">
-            <input type="password" id="login-mdp" placeholder="Mot de passe">
+            <div class="password-field">
+                <input type="password" id="login-mdp" placeholder="Mot de passe">
+                <span class="toggle-password" onclick="togglePassword('login-mdp', this)">👁️</span>
+            </div>
             <button id="btn-login" class="btn-primary">Se connecter</button>
             <p id="login-erreur" class="erreur"></p>
         </div>
@@ -22,6 +25,17 @@
     </div>
 
     <script>
+    function togglePassword(inputId, icon) {
+        var input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "🙈";
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️";
+        }
+    }
+
     document.getElementById("btn-login").addEventListener("click", function() {
         var email = document.getElementById("login-email").value;
         var mdp = document.getElementById("login-mdp").value;

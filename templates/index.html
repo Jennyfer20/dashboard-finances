@@ -11,9 +11,10 @@
 
     <div class="sidebar">
         <h2>💰 BudgetLab</h2>
-        <a href="#" class="active" onclick="changerPage('dashboard')">Tableau de bord</a>
-        <a href="#" onclick="changerPage('transactions')">Transactions</a>
-        <a href="/api/logout" class="logout-link">Deconnexion</a>
+        <a href="#" class="active" onclick="changerPage('dashboard')">📊 Tableau de bord</a>
+        <a href="#" onclick="changerPage('transactions')">💳 Transactions</a>
+        <a href="#" onclick="changerPage('parametres')">⚙️ Parametres</a>
+        <a href="/api/logout" class="logout-link">🚪 Deconnexion</a>
     </div>
 
     <div class="main">
@@ -21,11 +22,12 @@
         <div class="header">
             <h1 id="titre-page">Bonjour, {{ user_nom }} 👋</h1>
             <div class="theme-buttons">
-                <button id="btn-clair" class="btn-actif">Mode Clair</button>
-                <button id="btn-sombre">Mode Sombre</button>
+                <button id="btn-clair" class="btn-actif">☀️ Clair</button>
+                <button id="btn-sombre">🌙 Sombre</button>
             </div>
         </div>
 
+        <!-- PAGE DASHBOARD -->
         <div id="page-dashboard" class="page">
             <div class="cartes">
                 <div class="carte carte-solde">
@@ -67,6 +69,7 @@
             </div>
         </div>
 
+        <!-- PAGE TRANSACTIONS -->
         <div id="page-transactions" class="page" style="display:none;">
             <div class="filtres">
                 <select id="filtre-categorie">
@@ -83,6 +86,48 @@
             </div>
         </div>
 
+        <!-- PAGE PARAMETRES -->
+        <div id="page-parametres" class="page" style="display:none;">
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h3>👤 Mon Profil</h3>
+                    <div class="formulaire">
+                        <label>Nom</label>
+                        <input type="text" id="param-nom" placeholder="Ton nom">
+                        <label>Email</label>
+                        <input type="email" id="param-email" placeholder="Ton email">
+                        <button id="btn-save-profil" class="btn-primary">Sauvegarder</button>
+                        <p id="profil-msg" class="msg"></p>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h3>🔒 Changer le mot de passe</h3>
+                    <div class="formulaire">
+                        <div class="password-field">
+                            <input type="password" id="param-ancien-mdp" placeholder="Ancien mot de passe">
+                            <span class="toggle-password" onclick="togglePasswordDash('param-ancien-mdp', this)">👁️</span>
+                        </div>
+                        <div class="password-field">
+                            <input type="password" id="param-nouveau-mdp" placeholder="Nouveau mot de passe">
+                            <span class="toggle-password" onclick="togglePasswordDash('param-nouveau-mdp', this)">👁️</span>
+                        </div>
+                        <div class="password-field">
+                            <input type="password" id="param-confirm-mdp" placeholder="Confirmer le nouveau">
+                            <span class="toggle-password" onclick="togglePasswordDash('param-confirm-mdp', this)">👁️</span>
+                        </div>
+                        <button id="btn-change-mdp" class="btn-primary">Changer le mot de passe</button>
+                        <p id="mdp-msg" class="msg"></p>
+                    </div>
+                </div>
+                <div class="settings-card danger-zone">
+                    <h3>⚠️ Zone dangereuse</h3>
+                    <p>Supprimer ton compte et toutes tes donnees. Cette action est irreversible.</p>
+                    <button id="btn-supprimer-compte" class="btn-danger">Supprimer mon compte</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- POPUP MODIFIER -->
         <div id="popup-modifier" class="popup-overlay" style="display:none;">
             <div class="popup-box">
                 <h3>Modifier la transaction</h3>

@@ -3,12 +3,26 @@ function changerPage(page) {
     pages.forEach(function (p) { p.style.display = "none"; });
     document.getElementById("page-" + page).style.display = "block";
 
-    var liens = document.querySelectorAll(".sidebar a");
+    var liens = document.querySelectorAll(".sidebar a:not(.logout-link)");
     liens.forEach(function (lien) { lien.classList.remove("active"); });
     event.target.classList.add("active");
 
     if (page === "transactions") {
         chargerCategories();
+    }
+    if (page === "parametres") {
+        chargerProfil();
+    }
+}
+
+function togglePasswordDash(inputId, icon) {
+    var input = document.getElementById(inputId);
+    if (input.type === "password") {
+        input.type = "text";
+        icon.textContent = "🙈";
+    } else {
+        input.type = "password";
+        icon.textContent = "👁️";
     }
 }
 
@@ -122,8 +136,19 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
+    // Charger les infos du profil
+    window.chargerProfil = function () {
+        fetch("/api/profil")
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                document.getElementById("param-nom").value = data.nom;
+                document.getElementById("param-email").value = data.email;
+            });
+    };
+
     chargerDonnees();
 
+    // Bouton Ajouter
     document.getElementById("btn-ajouter").addEventListener("click", function () {
         var type = document.getElementById("form-type").value;
         var categorie = document.getElementById("form-categorie").value;
@@ -147,6 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
+    // Bouton Filtrer
     document.getElementById("btn-filtrer").addEventListener("click", function () {
         chargerTransactions({
             categorie: document.getElementById("filtre-categorie").value,
@@ -155,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // Bouton Reset
     document.getElementById("btn-reset").addEventListener("click", function () {
         document.getElementById("filtre-categorie").value = "";
         document.getElementById("filtre-date-debut").value = "";
@@ -162,6 +189,7 @@ document.addEventListener("DOMContentLoaded", function () {
         chargerTransactions();
     });
 
+    // Bouton Sauvegarder transaction
     document.getElementById("btn-sauvegarder").addEventListener("click", function () {
         var id = document.getElementById("edit-id").value;
         fetch("/api/modifier/" + id, {
@@ -183,10 +211,94 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
+    // Bouton Annuler popup
     document.getElementById("btn-annuler").addEventListener("click", function () {
         document.getElementById("popup-modifier").style.display = "none";
     });
 
+    // === PARAMETRES ===
+
+    // Sauvegarder profil
+    document.getElementById("btn-save-profil").addEventListener("click", function () {
+        var nom = document.getElementById("param-nom").value;
+        var email = document.getElementById("param-email").value;
+        if (!nom || !email) { return; }
+
+        fetch("/api/profil/modifier", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nom: nom, email: email })
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var msg = document.getElementById("profil-msg");
+                if (data.succes) {
+                    msg.textContent = "Profil mis a jour !";
+                    msg.style.color = "#10b981";
+                    document.getElementById("titre-page").textContent = "Bonjour, " + nom + " 👋";
+                } else {
+                    msg.textContent = data.erreur;
+                    msg.style.color = "#ef4444";
+                }
+                setTimeout(function () { msg.textContent = ""; }, 3000);
+            });
+    });
+
+    // Changer mot de passe
+    document.getElementById("btn-change-mdp").addEventListener("click", function () {
+        var ancien = document.getElementById("param-ancien-mdp").value;
+        var nouveau = document.getElementById("param-nouveau-mdp").value;
+        var confirm = document.getElementById("param-confirm-mdp").value;
+        var msg = document.getElementById("mdp-msg");
+
+        if (!ancien || !nouveau || !confirm) {
+            msg.textContent = "Remplis tous les champs !";
+            msg.style.color = "#ef4444";
+            return;
+        }
+        if (nouveau !== confirm) {
+            msg.textContent = "Les mots de passe ne correspondent pas !";
+            msg.style.color = "#ef4444";
+            return;
+        }
+
+        fetch("/api/profil/mot-de-passe", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ancien: ancien, nouveau: nouveau })
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.succes) {
+                    msg.textContent = "Mot de passe change !";
+                    msg.style.color = "#10b981";
+                    document.getElementById("param-ancien-mdp").value = "";
+                    document.getElementById("param-nouveau-mdp").value = "";
+                    document.getElementById("param-confirm-mdp").value = "";
+                } else {
+                    msg.textContent = data.erreur;
+                    msg.style.color = "#ef4444";
+                }
+                setTimeout(function () { msg.textContent = ""; }, 3000);
+            });
+    });
+
+    // Supprimer compte
+    document.getElementById("btn-supprimer-compte").addEventListener("click", function () {
+        if (confirm("Es-tu VRAIMENT sur de vouloir supprimer ton compte ? Toutes tes donnees seront perdues.")) {
+            if (confirm("Derniere chance ! Cette action est irreversible.")) {
+                fetch("/api/profil/supprimer", { method: "DELETE" })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (data.succes) {
+                            window.location.href = "/";
+                        }
+                    });
+            }
+        }
+    });
+
+    // Mode sombre
     document.getElementById("btn-sombre").addEventListener("click", function () {
         document.body.classList.add("dark");
         document.getElementById("btn-sombre").classList.add("btn-actif");
