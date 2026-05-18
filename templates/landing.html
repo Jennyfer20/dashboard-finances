@@ -6,6 +6,10 @@
     <title>BudgetLab</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="/static/favicon.png" type="image/png">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/static/icon-192x192.png">
 </head>
 <body class="landing-body">
 
@@ -45,6 +49,11 @@
         </div>
 
     </div>
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/static/sw.js");
+    }
+    </script>
 
 </body>
 </html>

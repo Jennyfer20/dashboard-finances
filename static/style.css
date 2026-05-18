@@ -4,6 +4,35 @@
     box-sizing: border-box;
 }
 
+/* === ICONS === */
+.icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.icon-sm {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.toggle-password-icon {
+    position: absolute;
+    right: 12px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.toggle-password-icon:hover {
+    color: #3b82f6;
+}
+
 /* === LANDING PAGE === */
 .landing-body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -206,14 +235,6 @@
     padding-right: 45px;
 }
 
-.toggle-password {
-    position: absolute;
-    right: 12px;
-    cursor: pointer;
-    font-size: 18px;
-    user-select: none;
-}
-
 /* === DASHBOARD === */
 .dashboard-body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -239,7 +260,8 @@
 }
 
 .sidebar a {
-    display: block;
+    display: flex;
+    align-items: center;
     color: #94a3b8;
     text-decoration: none;
     padding: 10px 0;
@@ -251,6 +273,10 @@
 .sidebar a:hover,
 .sidebar a.active {
     color: white;
+}
+
+.sidebar a .icon {
+    stroke: currentColor;
 }
 
 .logout-link {
@@ -298,6 +324,9 @@
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .theme-buttons button.btn-actif {
@@ -563,6 +592,8 @@
     color: #1e293b;
     font-size: 18px;
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
 }
 
 .msg {
@@ -767,6 +798,10 @@
     color: #94a3b8;
 }
 
+.dashboard-body.dark .toggle-password-icon {
+    color: #64748b;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
     .big-title {
@@ -821,6 +856,12 @@
         padding: 5px 8px;
         white-space: nowrap;
         font-size: 12px;
+    }
+
+    .sidebar a .icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
     }
 
     .logout-link {

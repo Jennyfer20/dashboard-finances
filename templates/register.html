@@ -6,22 +6,27 @@
     <title>BudgetLab - Inscription</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="/static/favicon.png" type="image/png">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/static/icon-192x192.png">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="auth-body">
 
     <div class="auth-box">
-        <h1 class="logo">💰 BudgetLab</h1>
+        <h1 class="logo">BudgetLab</h1>
         <h2>Creer un compte</h2>
         <div class="formulaire">
             <input type="text" id="reg-nom" placeholder="Ton nom">
             <input type="email" id="reg-email" placeholder="Email">
             <div class="password-field">
                 <input type="password" id="reg-mdp" placeholder="Mot de passe">
-                <span class="toggle-password" onclick="togglePassword('reg-mdp', this)">👁️</span>
+                <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp', this)"></i>
             </div>
             <div class="password-field">
                 <input type="password" id="reg-mdp2" placeholder="Confirmer le mot de passe">
-                <span class="toggle-password" onclick="togglePassword('reg-mdp2', this)">👁️</span>
+                <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp2', this)"></i>
             </div>
             <button id="btn-register" class="btn-primary">S'inscrire</button>
             <p id="reg-erreur" class="erreur"></p>
@@ -30,15 +35,18 @@
     </div>
 
     <script>
+    lucide.createIcons();
+
     function togglePassword(inputId, icon) {
         var input = document.getElementById(inputId);
         if (input.type === "password") {
             input.type = "text";
-            icon.textContent = "🙈";
+            icon.setAttribute("data-lucide", "eye-off");
         } else {
             input.type = "password";
-            icon.textContent = "👁️";
+            icon.setAttribute("data-lucide", "eye");
         }
+        lucide.createIcons();
     }
 
     document.getElementById("btn-register").addEventListener("click", function() {
