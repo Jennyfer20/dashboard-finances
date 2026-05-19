@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("btn-sauvegarder").addEventListener("click", function () {
         var id = document.getElementById("edit-id").value;
         fetch("/api/modifier/" + id, {
-            method: "PUT",
+            method: "PUT",   
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 type: document.getElementById("edit-type").value,
@@ -312,3 +312,58 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
