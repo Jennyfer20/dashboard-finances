@@ -1,3 +1,13 @@
+// === SIDEBAR MOBILE ===
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("sidebar-overlay").classList.toggle("active");
+}
+
+function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebar-overlay").classList.remove("active");
+}
 function changerPage(page) {
     var pages = document.querySelectorAll(".page");
     pages.forEach(function (p) { p.style.display = "none"; });
@@ -6,6 +16,7 @@ function changerPage(page) {
     var liens = document.querySelectorAll(".sidebar a:not(.logout-link)");
     liens.forEach(function (lien) { lien.classList.remove("active"); });
     event.target.classList.add("active");
+    closeSidebar();
 
     if (page === "transactions") {
         chargerCategories();
@@ -27,6 +38,9 @@ function togglePasswordDash(inputId, icon) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Hamburger menu
+    document.getElementById("btn-menu").addEventListener("click", toggleSidebar);
+    document.getElementById("sidebar-overlay").addEventListener("click", closeSidebar);
 
     var graphiqueDepenses = null;
 
@@ -193,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("btn-sauvegarder").addEventListener("click", function () {
         var id = document.getElementById("edit-id").value;
         fetch("/api/modifier/" + id, {
-            method: "PUT",   
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 type: document.getElementById("edit-type").value,
@@ -366,4 +380,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
- 

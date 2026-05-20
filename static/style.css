@@ -803,74 +803,80 @@
 }
 
 /* === RESPONSIVE === */
+/* === HAMBURGER BUTTON === */
+.hamburger {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1001;
+    background-color: #1e293b;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    color: white;
+}
+
+.hamburger .icon {
+    stroke: white;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
-    .big-title {
-        font-size: 36px;
-        margin-bottom: 30px;
-    }
-
-    .landing-features {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .feature {
-        min-width: auto;
-    }
-
-    .landing-cta {
-        flex-direction: column;
-        text-align: center;
-        padding: 20px;
-    }
-
-    .landing-nav {
-        padding: 15px 20px;
-    }
-
-    .auth-box {
-        width: 90%;
-        padding: 25px;
-    }
-
-    .dashboard-body {
-        flex-direction: column;
+    .hamburger {
+        display: block;
     }
 
     .sidebar {
-        width: 100%;
-        padding: 12px 15px;
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        overflow-x: auto;
+        position: fixed;
+        top: 0;
+        left: -260px;
+        height: 100%;
+        width: 240px;
+        z-index: 999;
+        transition: left 0.3s ease;
+        flex-direction: column;
+        padding: 30px 20px;
+    }
+
+    .sidebar.open {
+        left: 0;
     }
 
     .sidebar h2 {
-        margin-bottom: 0;
-        font-size: 16px;
-        white-space: nowrap;
+        margin-bottom: 30px;
+        font-size: 22px;
     }
 
     .sidebar a {
-        padding: 5px 8px;
-        white-space: nowrap;
-        font-size: 12px;
-    }
-
-    .sidebar a .icon {
-        width: 14px;
-        height: 14px;
-        margin-right: 4px;
+        padding: 12px 0;
+        font-size: 15px;
+        white-space: normal;
     }
 
     .logout-link {
-        margin-top: 0;
-        margin-left: auto;
+        margin-top: auto;
     }
 
     .main {
         padding: 15px;
+        padding-top: 60px;
     }
 
     .header {
@@ -919,6 +925,35 @@
 
     .settings-grid {
         grid-template-columns: 1fr;
+    }
+
+    .big-title {
+        font-size: 36px;
+        margin-bottom: 30px;
+    }
+
+    .landing-features {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .feature {
+        min-width: auto;
+    }
+
+    .landing-cta {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .landing-nav {
+        padding: 15px 20px;
+    }
+
+    .auth-box {
+        width: 90%;
+        padding: 25px;
     }
 }
 
