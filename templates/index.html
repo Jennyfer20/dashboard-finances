@@ -14,7 +14,11 @@
 </head>
 <body class="dashboard-body">
 
-    <div class="sidebar">
+    <button class="hamburger" id="btn-menu">
+        <i data-lucide="menu" class="icon"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="sidebar" id="sidebar">
         <h2>BudgetLab</h2>
         <a href="#" class="active" onclick="changerPage('dashboard')"><i data-lucide="layout-dashboard" class="icon"></i> Tableau de bord</a>
         <a href="#" onclick="changerPage('transactions')"><i data-lucide="arrow-left-right" class="icon"></i> Transactions</a>
@@ -33,7 +37,7 @@
         </div>
 
         <!-- PAGE DASHBOARD -->
-        <div id="page-dashboard" class="page">
+        <div id="page-dashboard" class="page">  
             <div class="cartes">
                 <div class="carte carte-solde">
                     <h3>Solde</h3>
