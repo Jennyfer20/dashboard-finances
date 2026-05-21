@@ -16,7 +16,19 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nom TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        mot_de_passe TEXT NOT NULL
+        mot_de_passe TEXT NOT NULL,
+        role TEXT DEFAULT 'comptable'
+    )""")
+    conn.execute("""CREATE TABLE IF NOT EXISTS employes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        poste TEXT NOT NULL,
+        departement TEXT NOT NULL,
+        salaire_base INTEGER NOT NULL,
+        email TEXT,
+        telephone TEXT,
+        date_embauche TEXT DEFAULT (date('now')),
+        actif INTEGER DEFAULT 1
     )""")
     conn.execute("""CREATE TABLE IF NOT EXISTS transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,6 +40,18 @@ def init_db():
         date_ajout TEXT DEFAULT (date('now')),
         FOREIGN KEY (user_id) REFERENCES users(id)
     )""")
+    conn.execute("""CREATE TABLE IF NOT EXISTS salaires (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        employe_id INTEGER NOT NULL,
+        mois TEXT NOT NULL,
+        montant INTEGER NOT NULL,
+        bonus INTEGER DEFAULT 0,
+        deductions INTEGER DEFAULT 0,
+        net_paye INTEGER NOT NULL,
+        statut TEXT DEFAULT 'en_attente',
+        date_paiement TEXT,
+        FOREIGN KEY (employe_id) REFERENCES employes(id)
+    )""")
     conn.commit()
     conn.close()
 
@@ -36,6 +60,7 @@ init_db()
 def hash_mdp(mot_de_passe):
     return hashlib.sha256(mot_de_passe.encode()).hexdigest()
 
+# === PAGES ===
 @app.route("/")
 def landing():
     return render_template("landing.html")
@@ -54,15 +79,14 @@ def dashboard():
         return redirect("/login")
     return render_template("index.html", user_nom=session["user_nom"])
 
+# === AUTH API ===
 @app.route("/api/register", methods=["POST"])
 def api_register():
     data = request.get_json()
     conn = get_db()
     try:
-        conn.execute(
-            "INSERT INTO users (nom, email, mot_de_passe) VALUES (?, ?, ?)",
-            (data["nom"], data["email"], hash_mdp(data["mot_de_passe"]))
-        )
+        conn.execute("INSERT INTO users (nom, email, mot_de_passe) VALUES (?, ?, ?)",
+            (data["nom"], data["email"], hash_mdp(data["mot_de_passe"])))
         conn.commit()
         user = conn.execute("SELECT * FROM users WHERE email=?", (data["email"],)).fetchone()
         session["user_id"] = user["id"]
@@ -77,10 +101,8 @@ def api_register():
 def api_login():
     data = request.get_json()
     conn = get_db()
-    user = conn.execute(
-        "SELECT * FROM users WHERE email=? AND mot_de_passe=?",
-        (data["email"], hash_mdp(data["mot_de_passe"]))
-    ).fetchone()
+    user = conn.execute("SELECT * FROM users WHERE email=? AND mot_de_passe=?",
+        (data["email"], hash_mdp(data["mot_de_passe"]))).fetchone()
     conn.close()
     if user:
         session["user_id"] = user["id"]
@@ -93,6 +115,7 @@ def api_logout():
     session.clear()
     return redirect("/")
 
+# === PROFIL API ===
 @app.route("/api/profil")
 def profil():
     if "user_id" not in session:
@@ -147,17 +170,31 @@ def supprimer_compte():
     session.clear()
     return jsonify({"succes": True})
 
-@app.route("/api/resume")
-def resume():
+# === DASHBOARD API ===
+@app.route("/api/dashboard")
+def api_dashboard():
     if "user_id" not in session:
         return jsonify({"erreur": "Non connecte"}), 401
     conn = get_db()
     uid = session["user_id"]
     revenus = conn.execute("SELECT COALESCE(SUM(montant),0) FROM transactions WHERE type='revenu' AND user_id=?", (uid,)).fetchone()[0]
     depenses = conn.execute("SELECT COALESCE(SUM(montant),0) FROM transactions WHERE type='depense' AND user_id=?", (uid,)).fetchone()[0]
-    nb = conn.execute("SELECT COUNT(*) FROM transactions WHERE user_id=?", (uid,)).fetchone()[0]
+    factures = conn.execute("SELECT COALESCE(SUM(montant),0) FROM transactions WHERE type='facture' AND user_id=?", (uid,)).fetchone()[0]
+    nb_trans = conn.execute("SELECT COUNT(*) FROM transactions WHERE user_id=?", (uid,)).fetchone()[0]
+    nb_employes = conn.execute("SELECT COUNT(*) FROM employes WHERE actif=1").fetchone()[0]
+    masse_salariale = conn.execute("SELECT COALESCE(SUM(salaire_base),0) FROM employes WHERE actif=1").fetchone()[0]
+    salaires_payes = conn.execute("SELECT COALESCE(SUM(net_paye),0) FROM salaires WHERE statut='paye'").fetchone()[0]
     conn.close()
-    return jsonify({"revenus":revenus,"depenses":depenses,"solde":revenus-depenses,"nb_transactions":nb})
+    return jsonify({
+        "revenus": revenus,
+        "depenses": depenses,
+        "factures": factures,
+        "benefice": revenus + factures - depenses - salaires_payes,
+        "nb_transactions": nb_trans,
+        "nb_employes": nb_employes,
+        "masse_salariale": masse_salariale,
+        "salaires_payes": salaires_payes
+    })
 
 @app.route("/api/depenses-par-categorie")
 def depenses_par_categorie():
@@ -168,17 +205,38 @@ def depenses_par_categorie():
     conn.close()
     return jsonify({"labels":[r["categorie"] for r in rows],"valeurs":[r["total"] for r in rows]})
 
+@app.route("/api/revenus-par-mois")
+def revenus_par_mois():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    conn = get_db()
+    rows = conn.execute("""SELECT substr(date_ajout,1,7) as mois, 
+        SUM(CASE WHEN type='revenu' OR type='facture' THEN montant ELSE 0 END) as revenus,
+        SUM(CASE WHEN type='depense' THEN montant ELSE 0 END) as depenses
+        FROM transactions WHERE user_id=? GROUP BY mois ORDER BY mois""", (session["user_id"],)).fetchall()
+    conn.close()
+    return jsonify({
+        "mois": [r["mois"] for r in rows],
+        "revenus": [r["revenus"] for r in rows],
+        "depenses": [r["depenses"] for r in rows]
+    })
+
+# === TRANSACTIONS API ===
 @app.route("/api/transactions")
 def liste_transactions():
     if "user_id" not in session:
         return jsonify({"erreur": "Non connecte"}), 401
     uid = session["user_id"]
+    type_filtre = request.args.get("type", "")
     categorie = request.args.get("categorie", "")
     date_debut = request.args.get("date_debut", "")
     date_fin = request.args.get("date_fin", "")
     conn = get_db()
     query = "SELECT * FROM transactions WHERE user_id=?"
     params = [uid]
+    if type_filtre:
+        query += " AND type=?"
+        params.append(type_filtre)
     if categorie:
         query += " AND categorie=?"
         params.append(categorie)
@@ -208,7 +266,8 @@ def ajouter():
         return jsonify({"erreur": "Non connecte"}), 401
     data = request.get_json()
     conn = get_db()
-    conn.execute("INSERT INTO transactions (user_id,type,categorie,montant,description) VALUES (?,?,?,?,?)", (session["user_id"],data["type"],data["categorie"],int(data["montant"]),data["description"]))
+    conn.execute("INSERT INTO transactions (user_id,type,categorie,montant,description) VALUES (?,?,?,?,?)",
+        (session["user_id"],data["type"],data["categorie"],int(data["montant"]),data["description"]))
     conn.commit()
     conn.close()
     return jsonify({"succes":True})
@@ -219,7 +278,8 @@ def modifier(id):
         return jsonify({"erreur": "Non connecte"}), 401
     data = request.get_json()
     conn = get_db()
-    conn.execute("UPDATE transactions SET type=?,categorie=?,montant=?,description=? WHERE id=? AND user_id=?", (data["type"],data["categorie"],int(data["montant"]),data["description"],id,session["user_id"]))
+    conn.execute("UPDATE transactions SET type=?,categorie=?,montant=?,description=? WHERE id=? AND user_id=?",
+        (data["type"],data["categorie"],int(data["montant"]),data["description"],id,session["user_id"]))
     conn.commit()
     conn.close()
     return jsonify({"succes":True})
@@ -234,5 +294,129 @@ def supprimer(id):
     conn.close()
     return jsonify({"succes":True})
 
+# === EMPLOYES API ===
+@app.route("/api/employes")
+def liste_employes():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM employes ORDER BY nom").fetchall()
+    conn.close()
+    return jsonify([{"id":r["id"],"nom":r["nom"],"poste":r["poste"],"departement":r["departement"],
+        "salaire_base":r["salaire_base"],"email":r["email"],"telephone":r["telephone"],
+        "date_embauche":r["date_embauche"],"actif":r["actif"]} for r in rows])
+
+@app.route("/api/employes/ajouter", methods=["POST"])
+def ajouter_employe():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    data = request.get_json()
+    conn = get_db()
+    conn.execute("INSERT INTO employes (nom,poste,departement,salaire_base,email,telephone) VALUES (?,?,?,?,?,?)",
+        (data["nom"],data["poste"],data["departement"],int(data["salaire_base"]),data.get("email",""),data.get("telephone","")))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes":True})
+
+@app.route("/api/employes/modifier/<int:id>", methods=["PUT"])
+def modifier_employe(id):
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    data = request.get_json()
+    conn = get_db()
+    conn.execute("UPDATE employes SET nom=?,poste=?,departement=?,salaire_base=?,email=?,telephone=? WHERE id=?",
+        (data["nom"],data["poste"],data["departement"],int(data["salaire_base"]),data.get("email",""),data.get("telephone",""),id))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes":True})
+
+@app.route("/api/employes/supprimer/<int:id>", methods=["DELETE"])
+def supprimer_employe(id):
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    conn = get_db()
+    conn.execute("UPDATE employes SET actif=0 WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes":True})
+
+# === SALAIRES API ===
+@app.route("/api/salaires")
+def liste_salaires():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    mois = request.args.get("mois", "")
+    conn = get_db()
+    query = """SELECT s.*, e.nom as employe_nom, e.poste as employe_poste 
+        FROM salaires s JOIN employes e ON s.employe_id=e.id"""
+    params = []
+    if mois:
+        query += " WHERE s.mois=?"
+        params.append(mois)
+    query += " ORDER BY s.id DESC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return jsonify([{"id":r["id"],"employe_id":r["employe_id"],"employe_nom":r["employe_nom"],
+        "employe_poste":r["employe_poste"],"mois":r["mois"],"montant":r["montant"],
+        "bonus":r["bonus"],"deductions":r["deductions"],"net_paye":r["net_paye"],
+        "statut":r["statut"],"date_paiement":r["date_paiement"]} for r in rows])
+
+@app.route("/api/salaires/generer", methods=["POST"])
+def generer_salaires():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    data = request.get_json()
+    mois = data["mois"]
+    conn = get_db()
+    existe = conn.execute("SELECT COUNT(*) FROM salaires WHERE mois=?", (mois,)).fetchone()[0]
+    if existe > 0:
+        conn.close()
+        return jsonify({"succes": False, "erreur": "Les salaires de ce mois existent deja"})
+    employes = conn.execute("SELECT * FROM employes WHERE actif=1").fetchall()
+    for e in employes:
+        net = e["salaire_base"]
+        conn.execute("INSERT INTO salaires (employe_id,mois,montant,bonus,deductions,net_paye) VALUES (?,?,?,0,0,?)",
+            (e["id"], mois, e["salaire_base"], net))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes": True, "nb": len(employes)})
+
+@app.route("/api/salaires/payer/<int:id>", methods=["PUT"])
+def payer_salaire(id):
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    conn = get_db()
+    conn.execute("UPDATE salaires SET statut='paye', date_paiement=date('now') WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes": True})
+
+@app.route("/api/salaires/payer-tous", methods=["PUT"])
+def payer_tous_salaires():
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    data = request.get_json()
+    conn = get_db()
+    conn.execute("UPDATE salaires SET statut='paye', date_paiement=date('now') WHERE mois=? AND statut='en_attente'", (data["mois"],))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes": True})
+
+@app.route("/api/salaires/modifier/<int:id>", methods=["PUT"])
+def modifier_salaire(id):
+    if "user_id" not in session:
+        return jsonify({"erreur": "Non connecte"}), 401
+    data = request.get_json()
+    bonus = int(data.get("bonus", 0))
+    deductions = int(data.get("deductions", 0))
+    montant = int(data["montant"])
+    net = montant + bonus - deductions
+    conn = get_db()
+    conn.execute("UPDATE salaires SET montant=?,bonus=?,deductions=?,net_paye=? WHERE id=?",
+        (montant, bonus, deductions, net, id))
+    conn.commit()
+    conn.close()
+    return jsonify({"succes": True})
+
 if __name__ == "__main__":
-    app.run(debug=False, host="0.0.0.0", port=5000)    
+    app.run(debug=False, host="0.0.0.0", port=5000)

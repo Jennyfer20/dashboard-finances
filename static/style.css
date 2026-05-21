@@ -4,7 +4,6 @@
     box-sizing: border-box;
 }
 
-/* === ICONS === */
 .icon {
     width: 18px;
     height: 18px;
@@ -31,6 +30,35 @@
 
 .toggle-password-icon:hover {
     color: #3b82f6;
+}
+
+/* === BADGES === */
+.badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badge-green {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.badge-red {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-blue {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.badge-orange {
+    background-color: #ffedd5;
+    color: #ea580c;
 }
 
 /* === LANDING PAGE === */
@@ -172,7 +200,7 @@
     white-space: nowrap;
 }
 
-/* === AUTH PAGES === */
+/* === AUTH === */
 .auth-body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -223,7 +251,6 @@
     margin-top: 5px;
 }
 
-/* === PASSWORD TOGGLE === */
 .password-field {
     position: relative;
     display: flex;
@@ -338,7 +365,7 @@
 
 .cartes {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
@@ -358,7 +385,7 @@
 }
 
 .carte p {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
     color: #1e293b;
 }
@@ -519,6 +546,7 @@
 .transaction-cat {
     font-size: 12px;
     color: #94a3b8;
+    margin-top: 2px;
 }
 
 .transaction-date {
@@ -529,11 +557,13 @@
 .montant-revenu {
     color: #10b981;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .montant-depense {
     color: #ef4444;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .transaction-actions {
@@ -667,7 +697,8 @@
     gap: 10px;
 }
 
-#btn-sauvegarder {
+#btn-sauvegarder,
+#btn-save-emp {
     flex: 1;
     padding: 12px;
     border: none;
@@ -679,8 +710,43 @@
     cursor: pointer;
 }
 
-#btn-sauvegarder:hover {
+#btn-sauvegarder:hover,
+#btn-save-emp:hover {
     background-color: #059669;
+}
+
+/* === HAMBURGER === */
+.hamburger {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1001;
+    background-color: #1e293b;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    color: white;
+}
+
+.hamburger .icon {
+    stroke: white;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+.sidebar-overlay.active {
+    display: block;
 }
 
 /* === MODE SOMBRE === */
@@ -802,39 +868,8 @@
     color: #64748b;
 }
 
-/* === RESPONSIVE === */
-/* === HAMBURGER BUTTON === */
-.hamburger {
-    display: none;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1001;
-    background-color: #1e293b;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    cursor: pointer;
-    color: white;
-}
-
-.hamburger .icon {
-    stroke: white;
-}
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-}
-
-.sidebar-overlay.active {
-    display: block;
+.dashboard-body.dark .hamburger {
+    background-color: #020617;
 }
 
 /* === RESPONSIVE === */
@@ -880,17 +915,16 @@
     }
 
     .header {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
+        flex-direction: row;
+        justify-content: flex-end;
     }
 
     .header h1 {
-        font-size: 18px;
+        display: none;
     }
 
     .cartes {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 10px;
     }
 
@@ -899,7 +933,7 @@
     }
 
     .carte p {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .graphiques {
@@ -921,6 +955,7 @@
 
     .transaction-actions {
         margin-left: 0;
+        width: 100%;
     }
 
     .settings-grid {
@@ -978,10 +1013,10 @@
     }
 
     .cartes {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
     }
 
-    .header h1 {
+    .carte p {
         font-size: 16px;
     }
 }

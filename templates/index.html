@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BudgetLab - Dashboard</title>
+    <title>BudgetLab - Enterprise</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="/static/favicon.png" type="image/png">
     <link rel="manifest" href="/static/manifest.json">
@@ -20,8 +20,10 @@
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <div class="sidebar" id="sidebar">
         <h2>BudgetLab</h2>
-        <a href="#" class="active" onclick="changerPage('dashboard')"><i data-lucide="layout-dashboard" class="icon"></i> Tableau de bord</a>
+        <a href="#" class="active" onclick="changerPage('dashboard')"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard</a>
         <a href="#" onclick="changerPage('transactions')"><i data-lucide="arrow-left-right" class="icon"></i> Transactions</a>
+        <a href="#" onclick="changerPage('employes')"><i data-lucide="users" class="icon"></i> Employes</a>
+        <a href="#" onclick="changerPage('salaires')"><i data-lucide="banknote" class="icon"></i> Salaires</a>
         <a href="#" onclick="changerPage('parametres')"><i data-lucide="settings" class="icon"></i> Parametres</a>
         <a href="/api/logout" class="logout-link"><i data-lucide="log-out" class="icon"></i> Deconnexion</a>
     </div>
@@ -37,61 +39,85 @@
         </div>
 
         <!-- PAGE DASHBOARD -->
-        <div id="page-dashboard" class="page">  
-            <div class="cartes">
-                <div class="carte carte-solde">
-                    <h3>Solde</h3>
-                    <p id="val-solde">Chargement...</p>
-                </div>
-                <div class="carte carte-revenus">
-                    <h3>Revenus</h3>
-                    <p id="val-revenus">Chargement...</p>
-                </div>
-                <div class="carte carte-depenses">
-                    <h3>Depenses</h3>
-                    <p id="val-depenses">Chargement...</p>
-                </div>
-                <div class="carte carte-transactions">
-                    <h3>Transactions</h3>
-                    <p id="val-transactions">Chargement...</p>
-                </div>
+        <div id="page-dashboard" class="page">
+            <div class="cartes" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="carte carte-revenus"><h3>Chiffre d'affaires</h3><p id="val-ca">0 FCFA</p></div>
+                <div class="carte carte-depenses"><h3>Depenses</h3><p id="val-depenses">0 FCFA</p></div>
+                <div class="carte carte-solde"><h3>Benefice</h3><p id="val-benefice">0 FCFA</p></div>
+                <div class="carte" style="border-top-color:#8b5cf6;"><h3>Masse salariale</h3><p id="val-masse">0 FCFA</p></div>
+                <div class="carte" style="border-top-color:#ec4899;"><h3>Employes actifs</h3><p id="val-employes">0</p></div>
+                <div class="carte carte-transactions"><h3>Transactions</h3><p id="val-transactions">0</p></div>
             </div>
-
             <div class="graphiques">
-                <div class="graphique-box">
-                    <h3>Depenses par categorie</h3>
-                    <canvas id="graphique-depenses"></canvas>
-                </div>
-                <div class="graphique-box formulaire-box">
-                    <h3>Ajouter une transaction</h3>
-                    <div class="formulaire">
-                        <select id="form-type">
-                            <option value="depense">Depense</option>
-                            <option value="revenu">Revenu</option>
-                        </select>
-                        <input type="text" id="form-categorie" placeholder="Categorie (ex: Nourriture)">
-                        <input type="number" id="form-montant" placeholder="Montant (FCFA)">
-                        <input type="text" id="form-description" placeholder="Description">
-                        <button id="btn-ajouter">Ajouter</button>
-                    </div>
-                </div>
+                <div class="graphique-box"><h3>Revenus vs Depenses par mois</h3><canvas id="graphique-mensuel"></canvas></div>
+                <div class="graphique-box"><h3>Depenses par categorie</h3><canvas id="graphique-depenses"></canvas></div>
             </div>
         </div>
 
         <!-- PAGE TRANSACTIONS -->
         <div id="page-transactions" class="page" style="display:none;">
+            <div class="section-transactions" style="margin-bottom:20px;">
+                <h3>Ajouter une transaction</h3>
+                <div class="formulaire" style="flex-direction:row; flex-wrap:wrap; gap:10px; margin-top:10px;">
+                    <select id="form-type" style="flex:1; min-width:120px;">
+                        <option value="revenu">Revenu</option>
+                        <option value="depense">Depense</option>
+                        <option value="facture">Facture client</option>
+                    </select>
+                    <input type="text" id="form-categorie" placeholder="Categorie" style="flex:1; min-width:120px;">
+                    <input type="number" id="form-montant" placeholder="Montant (FCFA)" style="flex:1; min-width:120px;">
+                    <input type="text" id="form-description" placeholder="Description" style="flex:2; min-width:150px;">
+                    <button id="btn-ajouter" style="min-width:100px;">Ajouter</button>
+                </div>
+            </div>
             <div class="filtres">
-                <select id="filtre-categorie">
-                    <option value="">Toutes les categories</option>
-                </select>
+                <select id="filtre-type"><option value="">Tous les types</option><option value="revenu">Revenu</option><option value="depense">Depense</option><option value="facture">Facture</option></select>
+                <select id="filtre-categorie"><option value="">Toutes categories</option></select>
                 <input type="date" id="filtre-date-debut">
                 <input type="date" id="filtre-date-fin">
                 <button id="btn-filtrer">Filtrer</button>
                 <button id="btn-reset" class="btn-secondary">Reset</button>
             </div>
             <div class="section-transactions">
-                <h3>Toutes les transactions</h3>
+                <h3>Historique des transactions</h3>
                 <div id="liste-transactions">Chargement...</div>
+            </div>
+        </div>
+
+        <!-- PAGE EMPLOYES -->
+        <div id="page-employes" class="page" style="display:none;">
+            <div class="section-transactions" style="margin-bottom:20px;">
+                <h3>Ajouter un employe</h3>
+                <div class="formulaire" style="flex-direction:row; flex-wrap:wrap; gap:10px; margin-top:10px;">
+                    <input type="text" id="emp-nom" placeholder="Nom complet" style="flex:1; min-width:150px;">
+                    <input type="text" id="emp-poste" placeholder="Poste" style="flex:1; min-width:120px;">
+                    <input type="text" id="emp-dept" placeholder="Departement" style="flex:1; min-width:120px;">
+                    <input type="number" id="emp-salaire" placeholder="Salaire base (FCFA)" style="flex:1; min-width:140px;">
+                    <input type="email" id="emp-email" placeholder="Email" style="flex:1; min-width:150px;">
+                    <input type="tel" id="emp-tel" placeholder="Telephone" style="flex:1; min-width:120px;">
+                    <button id="btn-ajouter-emp" class="btn-primary" style="min-width:100px;">Ajouter</button>
+                </div>
+            </div>
+            <div class="section-transactions">
+                <h3>Liste des employes</h3>
+                <div id="liste-employes">Chargement...</div>
+            </div>
+        </div>
+
+        <!-- PAGE SALAIRES -->
+        <div id="page-salaires" class="page" style="display:none;">
+            <div class="section-transactions" style="margin-bottom:20px;">
+                <h3>Generer les salaires du mois</h3>
+                <div class="formulaire" style="flex-direction:row; gap:10px; margin-top:10px; align-items:center;">
+                    <input type="month" id="sal-mois" style="flex:1;">
+                    <button id="btn-generer-sal" class="btn-primary">Generer</button>
+                    <button id="btn-payer-tous" style="background-color:#10b981; color:white; border:none; border-radius:8px; padding:12px 20px; cursor:pointer;">Payer tous</button>
+                </div>
+                <p id="sal-msg" class="msg" style="margin-top:10px;"></p>
+            </div>
+            <div class="section-transactions">
+                <h3>Fiches de salaire</h3>
+                <div id="liste-salaires">Chargement...</div>
             </div>
         </div>
 
@@ -136,16 +162,13 @@
             </div>
         </div>
 
-        <!-- POPUP MODIFIER -->
+        <!-- POPUP MODIFIER TRANSACTION -->
         <div id="popup-modifier" class="popup-overlay" style="display:none;">
             <div class="popup-box">
                 <h3>Modifier la transaction</h3>
                 <div class="formulaire">
                     <input type="hidden" id="edit-id">
-                    <select id="edit-type">
-                        <option value="depense">Depense</option>
-                        <option value="revenu">Revenu</option>
-                    </select>
+                    <select id="edit-type"><option value="revenu">Revenu</option><option value="depense">Depense</option><option value="facture">Facture</option></select>
                     <input type="text" id="edit-categorie" placeholder="Categorie">
                     <input type="number" id="edit-montant" placeholder="Montant (FCFA)">
                     <input type="text" id="edit-description" placeholder="Description">
@@ -157,15 +180,33 @@
             </div>
         </div>
 
+        <!-- POPUP MODIFIER EMPLOYE -->
+        <div id="popup-modifier-emp" class="popup-overlay" style="display:none;">
+            <div class="popup-box">
+                <h3>Modifier l'employe</h3>
+                <div class="formulaire">
+                    <input type="hidden" id="edit-emp-id">
+                    <input type="text" id="edit-emp-nom" placeholder="Nom">
+                    <input type="text" id="edit-emp-poste" placeholder="Poste">
+                    <input type="text" id="edit-emp-dept" placeholder="Departement">
+                    <input type="number" id="edit-emp-salaire" placeholder="Salaire base (FCFA)">
+                    <input type="email" id="edit-emp-email" placeholder="Email">
+                    <input type="tel" id="edit-emp-tel" placeholder="Telephone">
+                    <div class="popup-buttons">
+                        <button id="btn-save-emp">Sauvegarder</button>
+                        <button id="btn-annuler-emp" class="btn-secondary">Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/script.js"></script>
     <script>
     lucide.createIcons();
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/static/sw.js");
-    }
+    if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/static/sw.js"); }
     </script>
 </body>
 </html>
