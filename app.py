@@ -1,7 +1,6 @@
-﻿from flask import Flask, render_template, jsonify, request, session, redirect
+﻿from flask import Flask, render_template, jsonify, request, session, redirect, send_file
 import sqlite3
 import hashlib
-
 app = Flask(__name__)
 app.secret_key = "budgetlab_secret_key_2024"
 
@@ -417,6 +416,90 @@ def modifier_salaire(id):
     conn.commit()
     conn.close()
     return jsonify({"succes": True})
+# API : generer PDF fiche de paie
+@app.route("/api/salaires/pdf/<int:id>")
+def pdf_salaire(id):
+    if "user_id" not in session:
+        return redirect("/login")
+    conn = get_db()
+    sal = conn.execute("""SELECT s.*, e.nom as employe_nom, e.poste as employe_poste, 
+        e.departement as employe_dept, e.email as employe_email
+        FROM salaires s JOIN employes e ON s.employe_id=e.id WHERE s.id=?""", (id,)).fetchone()
+    conn.close()
+    if not sal:
+        return jsonify({"erreur": "Fiche introuvable"}), 404
+
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import cm
+    import io
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    # Titre
+    titre_style = ParagraphStyle('titre', parent=styles['Title'], fontSize=24, textColor=colors.HexColor('#3b82f6'), spaceAfter=10)
+    elements.append(Paragraph("BudgetLab", titre_style))
+    elements.append(Paragraph("Fiche de paie", styles['Title']))
+    elements.append(Spacer(1, 20))
+
+    # Infos employe
+    info_style = ParagraphStyle('info', parent=styles['Normal'], fontSize=12, spaceAfter=5)
+    elements.append(Paragraph("<b>Employe :</b> " + sal["employe_nom"], info_style))
+    elements.append(Paragraph("<b>Poste :</b> " + sal["employe_poste"], info_style))
+    elements.append(Paragraph("<b>Departement :</b> " + sal["employe_dept"], info_style))
+    elements.append(Paragraph("<b>Email :</b> " + (sal["employe_email"] or ""), info_style))
+    elements.append(Paragraph("<b>Periode :</b> " + sal["mois"], info_style))
+    elements.append(Spacer(1, 20))
+
+    # Tableau salaire
+    data = [
+        ["Description", "Montant (FCFA)"],
+        ["Salaire de base", "{:,}".format(sal["montant"]).replace(",", " ")],
+        ["Bonus", "{:,}".format(sal["bonus"]).replace(",", " ")],
+        ["Deductions", "-{:,}".format(sal["deductions"]).replace(",", " ")],
+        ["", ""],
+        ["NET A PAYER", "{:,}".format(sal["net_paye"]).replace(",", " ")],
+    ]
+
+    table = Table(data, colWidths=[10*cm, 6*cm])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('GRID', (0, 0), (-1, -2), 0.5, colors.HexColor('#e2e8f0')),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f0fdf4')),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, -1), (-1, -1), 14),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+    ]))
+    elements.append(table)
+    elements.append(Spacer(1, 30))
+
+    # Statut
+    statut_text = "PAYE" if sal["statut"] == "paye" else "EN ATTENTE"
+    statut_color = '#10b981' if sal["statut"] == "paye" else '#f59e0b'
+    statut_style = ParagraphStyle('statut', parent=styles['Normal'], fontSize=14, textColor=colors.HexColor(statut_color))
+    elements.append(Paragraph("<b>Statut : " + statut_text + "</b>", statut_style))
+    if sal["date_paiement"]:
+        elements.append(Paragraph("Date de paiement : " + sal["date_paiement"], info_style))
+
+    elements.append(Spacer(1, 40))
+    footer_style = ParagraphStyle('footer', parent=styles['Normal'], fontSize=9, textColor=colors.grey)
+    elements.append(Paragraph("Document genere par BudgetLab - Gestion financiere d'entreprise", footer_style))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    filename = "fiche_paie_" + sal["employe_nom"].replace(" ", "_") + "_" + sal["mois"] + ".pdf"
+    return send_file(buffer, as_attachment=True, download_name=filename, mimetype='application/pdf')
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=5000)
