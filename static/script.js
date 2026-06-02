@@ -43,12 +43,20 @@ document.addEventListener("DOMContentLoaded", function () {
     // === DASHBOARD ===
     window.chargerDashboard = function () {
         fetch("/api/dashboard").then(function (r) { return r.json(); }).then(function (data) {
-            document.getElementById("val-ca").textContent = (data.revenus + data.factures).toLocaleString() + " FCFA";
-            document.getElementById("val-depenses").textContent = data.depenses.toLocaleString() + " FCFA";
-            document.getElementById("val-benefice").textContent = data.benefice.toLocaleString() + " FCFA";
-            document.getElementById("val-masse").textContent = data.masse_salariale.toLocaleString() + " FCFA";
-            document.getElementById("val-employes").textContent = data.nb_employes;
-            document.getElementById("val-transactions").textContent = data.nb_transactions;
+            if (typeof USER_MODE !== 'undefined' && USER_MODE === 'entreprise') {
+                document.getElementById("val-ca").textContent = (data.revenus + data.factures).toLocaleString() + " FCFA";
+                document.getElementById("val-depenses").textContent = data.depenses.toLocaleString() + " FCFA";
+                document.getElementById("val-benefice").textContent = data.benefice.toLocaleString() + " FCFA";
+                document.getElementById("val-masse").textContent = data.masse_salariale.toLocaleString() + " FCFA";
+                document.getElementById("val-employes").textContent = data.nb_employes;
+                document.getElementById("val-transactions").textContent = data.nb_transactions;
+            } else {
+                var solde = data.revenus - data.depenses;
+                if (document.getElementById("val-solde")) document.getElementById("val-solde").textContent = solde.toLocaleString() + " FCFA";
+                if (document.getElementById("val-revenus-perso")) document.getElementById("val-revenus-perso").textContent = data.revenus.toLocaleString() + " FCFA";
+                if (document.getElementById("val-depenses-perso")) document.getElementById("val-depenses-perso").textContent = data.depenses.toLocaleString() + " FCFA";
+                if (document.getElementById("val-transactions-perso")) document.getElementById("val-transactions-perso").textContent = data.nb_transactions;
+            }
         });
 
         fetch("/api/revenus-par-mois").then(function (r) { return r.json(); }).then(function (data) {
@@ -205,12 +213,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 var statutClass = s.statut === "paye" ? "badge-green" : "badge-orange";
                 var statutText = s.statut === "paye" ? "Paye" : "En attente";
                 div.innerHTML =
-                    
-    // Theme
-    document.getElementById("btn-sombre").addEventListener("click", function () {
-        document.body.classList.add("dark"); document.getElementById("btn-sombre").classList.add("btn-actif"); document.getElementById("btn-clair").classList.remove("btn-actif");
-    });
-    document.getElementById("btn-clair").addEventListener("click", function () {
-        document.body.classList.remove("dark"); document.getElementById("btn-clair").classList.add("btn-actif"); document.getElementById("btn-sombre").classList.remove("btn-actif");
-    });
-});
+
+                    // Theme
+                    document.getElementById("btn-sombre").addEventListener("click", function () {
+                        document.body.classList.add("dark"); document.getElementById("btn-sombre").classList.add("btn-actif"); document.getElementById("btn-clair").classList.remove("btn-actif");
+                    });
+                document.getElementById("btn-clair").addEventListener("click", function () {
+                    document.body.classList.remove("dark"); document.getElementById("btn-clair").classList.add("btn-actif"); document.getElementById("btn-sombre").classList.remove("btn-actif");
+                });
+            });

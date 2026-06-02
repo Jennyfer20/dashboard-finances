@@ -14,11 +14,21 @@
 </head>
 <body class="auth-body">
 
-    <div class="auth-box">
+    <div class="auth-bocode static\style.cssx">
         <h1 class="logo">BudgetLab</h1>
         <h2>Creer un compte</h2>
         <div class="formulaire">
+            <div class="mode-choice">
+                <button type="button" id="mode-perso" class="mode-btn active" onclick="choisirMode('perso')">Personnel</button>
+                <button type="button" id="mode-entreprise" class="mode-btn" onclick="choisirMode('entreprise')">Entreprise</button>
+            </div>
+            <input type="hidden" id="reg-mode" value="perso">
             <input type="text" id="reg-nom" placeholder="Ton nom">
+            <div class="mode-choice">
+                <button type="button" id="mode-perso" class="mode-btn active" onclick="choisirMode('perso')">Personnel</button>
+                <button type="button" id="mode-entreprise" class="mode-btn" onclick="choisirMode('entreprise')">Entreprise</button>
+            </div>
+            <input type="hidden" id="reg-mode" value="perso">
             <input type="email" id="reg-email" placeholder="Email">
             <div class="password-field">
                 <input type="password" id="reg-mdp" placeholder="Mot de passe">
@@ -48,6 +58,18 @@
         }
         lucide.createIcons();
     }
+    window.choisirMode = function(mode) {
+        document.getElementById("reg-mode").value = mode;
+        document.getElementById("mode-perso").classList.remove("active");
+        document.getElementById("mode-entreprise").classList.remove("active");
+        document.getElementById("mode-" + mode).classList.add("active");
+    };
+    window.choisirMode = function(mode) {
+        document.getElementById("reg-mode").value = mode;
+        document.getElementById("mode-perso").classList.remove("active");
+        document.getElementById("mode-entreprise").classList.remove("active");
+        document.getElementById("mode-" + mode).classList.add("active");
+    };
 
     document.getElementById("btn-register").addEventListener("click", function() {
         var nom = document.getElementById("reg-nom").value;
@@ -65,9 +87,9 @@
         fetch("/api/register", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({nom: nom, email: email, mot_de_passe: mdp})
+            body:JSON.stringify({nom: nom, email: email, mot_de_passe: mdp, mode: document.getElementById("reg-mode").value})
         })
-        .then(function(r) { return r.json(); })
+
         .then(function(data) {
             if (data.succes) {
                 window.location.href = "/dashboard";

@@ -22,10 +22,11 @@
         <h2>BudgetLab</h2>
         <a href="#" class="active" onclick="changerPage('dashboard')"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard</a>
         <a href="#" onclick="changerPage('transactions')"><i data-lucide="arrow-left-right" class="icon"></i> Transactions</a>
+        {% if user_mode == 'entreprise' %}
         <a href="#" onclick="changerPage('employes')"><i data-lucide="users" class="icon"></i> Employes</a>
         <a href="#" onclick="changerPage('salaires')"><i data-lucide="banknote" class="icon"></i> Salaires</a>
+        {% endif %}
         <a href="#" onclick="changerPage('parametres')"><i data-lucide="settings" class="icon"></i> Parametres</a>
-        <a href="/api/logout" class="logout-link"><i data-lucide="log-out" class="icon"></i> Deconnexion</a>
     </div>
 
     <div class="main">
@@ -40,6 +41,7 @@
 
         <!-- PAGE DASHBOARD -->
         <div id="page-dashboard" class="page">
+            {% if user_mode == 'entreprise' %}
             <div class="cartes" style="grid-template-columns: repeat(3, 1fr);">
                 <div class="carte carte-revenus"><h3>Chiffre d'affaires</h3><p id="val-ca">0 FCFA</p></div>
                 <div class="carte carte-depenses"><h3>Depenses</h3><p id="val-depenses">0 FCFA</p></div>
@@ -48,6 +50,19 @@
                 <div class="carte" style="border-top-color:#ec4899;"><h3>Employes actifs</h3><p id="val-employes">0</p></div>
                 <div class="carte carte-transactions"><h3>Transactions</h3><p id="val-transactions">0</p></div>
             </div>
+            {% else %}
+            <div class="cartes" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="carte carte-solde"><h3>Solde</h3><p id="val-solde">0 FCFA</p></div>
+                <div class="carte carte-revenus"><h3>Revenus</h3><p id="val-revenus-perso">0 FCFA</p></div>
+                <div class="carte carte-depenses"><h3>Depenses</h3><p id="val-depenses-perso">0 FCFA</p></div>
+                <div class="carte carte-transactions"><h3>Transactions</h3><p id="val-transactions-perso">0</p></div>
+            </div>
+            {% endif %}
+            <div class="graphiques">
+                <div class="graphique-box"><h3>{% if user_mode == 'entreprise' %}Revenus vs Depenses par mois{% else %}Evolution mensuelle{% endif %}</h3><canvas id="graphique-mensuel"></canvas></div>
+                <div class="graphique-box"><h3>Depenses par categorie</h3><canvas id="graphique-depenses"></canvas></div>
+            </div>
+        </div>
             <div class="graphiques">
                 <div class="graphique-box"><h3>Revenus vs Depenses par mois</h3><canvas id="graphique-mensuel"></canvas></div>
                 <div class="graphique-box"><h3>Depenses par categorie</h3><canvas id="graphique-depenses"></canvas></div>
@@ -206,6 +221,7 @@
     <script src="/static/script.js"></script>
     <script>
     lucide.createIcons();
+    var USER_MODE = "{{ user_mode }}";
     if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/static/sw.js"); }
     </script>
 </body>

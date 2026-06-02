@@ -16,7 +16,8 @@ def init_db():
         nom TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         mot_de_passe TEXT NOT NULL,
-        role TEXT DEFAULT 'comptable'
+        role TEXT DEFAULT 'comptable',
+        mode TEXT DEFAULT 'perso'
     )""")
     conn.execute("""CREATE TABLE IF NOT EXISTS employes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,20 +77,21 @@ def register_page():
 def dashboard():
     if "user_id" not in session:
         return redirect("/login")
-    return render_template("index.html", user_nom=session["user_nom"])
-
+    return render_template("index.html", user_nom=session["user_nom"], user_mode=session.get("user_mode", "perso"))
 # === AUTH API ===
 @app.route("/api/register", methods=["POST"])
 def api_register():
     data = request.get_json()
     conn = get_db()
     try:
-        conn.execute("INSERT INTO users (nom, email, mot_de_passe) VALUES (?, ?, ?)",
-            (data["nom"], data["email"], hash_mdp(data["mot_de_passe"])))
+        conn.execute(
+            "INSERT INTO users (nom, email, mot_de_passe, mode) VALUES (?, ?, ?, ?)",
+            (data["nom"], data["email"], hash_mdp(data["mot_de_passe"]), data.get("mode", "perso")))
         conn.commit()
         user = conn.execute("SELECT * FROM users WHERE email=?", (data["email"],)).fetchone()
         session["user_id"] = user["id"]
-        session["user_nom"] = user["nom"]
+        session["user_nom"] = user["nom"] 
+        session["user_mode"] = user["mode"]
         conn.close()
         return jsonify({"succes": True})
     except sqlite3.IntegrityError:
@@ -106,6 +108,7 @@ def api_login():
     if user:
         session["user_id"] = user["id"]
         session["user_nom"] = user["nom"]
+        session["user_mode"] = user["mode"]
         return jsonify({"succes": True})
     return jsonify({"succes": False, "erreur": "Email ou mot de passe incorrect"})
 
