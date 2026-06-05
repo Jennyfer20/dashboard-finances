@@ -12,60 +12,94 @@
     <link rel="apple-touch-icon" href="/static/icon-192x192.png">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="auth-body">
-
-    <div class="auth-box">
-        <h1 class="logo">BudgetLab</h1>
-        <h2>Connexion</h2>
-        <div class="formulaire">
-            <input type="email" id="login-email" placeholder="Email">
-            <div class="password-field">
-                <input type="password" id="login-mdp" placeholder="Mot de passe">
-                <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('login-mdp', this)"></i>
+<body class="login-body">
+    <div class="login-split">
+        <div class="login-left">
+            <div class="login-brand-logo">BudgetLab</div>
+            <p class="login-brand-tagline">Gérez vos finances<br>en toute simplicité</p>
+            <p class="login-brand-desc">
+                Une plateforme complète pour les particuliers et les entreprises.<br>
+                Suivez vos revenus, maîtrisez vos dépenses, gérez votre équipe.
+            </p>
+            <div class="login-features-list">
+                <div class="login-feature-item">
+                    <div class="feat-icon">
+                        <i data-lucide="trending-up" style="width:18px;height:18px;color:#3b82f6;"></i>
+                    </div>
+                    <span>Suivi des revenus &amp; dépenses en temps réel</span>
+                </div>
+                <div class="login-feature-item">
+                    <div class="feat-icon">
+                        <i data-lucide="users" style="width:18px;height:18px;color:#3b82f6;"></i>
+                    </div>
+                    <span>Gestion des employés &amp; fiches de paie PDF</span>
+                </div>
+                <div class="login-feature-item">
+                    <div class="feat-icon">
+                        <i data-lucide="bar-chart-2" style="width:18px;height:18px;color:#3b82f6;"></i>
+                    </div>
+                    <span>Rapports &amp; analyses financiers détaillés</span>
+                </div>
+                <div class="login-feature-item">
+                    <div class="feat-icon">
+                        <i data-lucide="shield-check" style="width:18px;height:18px;color:#3b82f6;"></i>
+                    </div>
+                    <span>Données sécurisées, accès personnel ou entreprise</span>
+                </div>
             </div>
-            <button id="btn-login" class="btn-primary">Se connecter</button>
-            <p id="login-erreur" class="erreur"></p>
         </div>
-        <p class="auth-link">Pas encore de compte ? <a href="/register">S'inscrire</a></p>
+        <div class="login-right">
+            <div class="login-right-inner">
+                <h2>Bon retour !</h2>
+                <p class="login-right-subtitle">Connectez-vous à votre espace financier</p>
+                <div class="formulaire">
+                    <input type="email" id="login-email" placeholder="Votre adresse email" autocomplete="email">
+                    <div class="password-field">
+                        <input type="password" id="login-mdp" placeholder="Mot de passe" autocomplete="current-password">
+                        <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('login-mdp', this)"></i>
+                    </div>
+                    <button id="btn-login" class="btn-primary btn-full">Se connecter</button>
+                    <p id="login-erreur" class="erreur"></p>
+                </div>
+                <p class="auth-link" style="margin-top:28px;">
+                    Pas encore de compte ? <a href="/register">Créer un compte</a>
+                </p>
+            </div>
+        </div>
     </div>
-
     <script>
-    lucide.createIcons();
-
-    function togglePassword(inputId, icon) {
-        var input = document.getElementById(inputId);
-        if (input.type === "password") {
-            input.type = "text";
-            icon.setAttribute("data-lucide", "eye-off");
-        } else {
-            input.type = "password";
-            icon.setAttribute("data-lucide", "eye");
-        }
-        lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    function togglePassword(id, icon) {
+        var i = document.getElementById(id);
+        if (i.type === "password") { i.type = "text"; icon.setAttribute("data-lucide", "eye-off"); }
+        else { i.type = "password"; icon.setAttribute("data-lucide", "eye"); }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
-
     document.getElementById("btn-login").addEventListener("click", function() {
-        var email = document.getElementById("login-email").value;
+        var email = document.getElementById("login-email").value.trim();
         var mdp = document.getElementById("login-mdp").value;
-        if (!email || !mdp) {
-            document.getElementById("login-erreur").textContent = "Remplis tous les champs !";
-            return;
-        }
+        var errEl = document.getElementById("login-erreur");
+        errEl.textContent = "";
+        if (!email || !mdp) { errEl.textContent = "Remplis tous les champs !"; return; }
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = "Connexion...";
         fetch("/api/login", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({email: email, mot_de_passe: mdp})
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, mot_de_passe: mdp })
         })
         .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (data.succes) {
-                window.location.href = "/dashboard";
-            } else {
-                document.getElementById("login-erreur").textContent = data.erreur;
-            }
+        .then(function(d) {
+            if (d.succes) { window.location.href = "/dashboard"; }
+            else { errEl.textContent = d.erreur; btn.disabled = false; btn.textContent = "Se connecter"; }
+        })
+        .catch(function() {
+            errEl.textContent = "Erreur de connexion. Vérifiez que le serveur est lancé.";
+            btn.disabled = false;
+            btn.textContent = "Se connecter";
         });
     });
     </script>
-
 </body>
 </html>

@@ -13,92 +13,104 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="auth-body">
-
-    <div class="auth-bocode static\style.cssx">
+    <div class="auth-box">
         <h1 class="logo">BudgetLab</h1>
-        <h2>Creer un compte</h2>
-        <div class="formulaire">
-            <div class="mode-choice">
-                <button type="button" id="mode-perso" class="mode-btn active" onclick="choisirMode('perso')">Personnel</button>
-                <button type="button" id="mode-entreprise" class="mode-btn" onclick="choisirMode('entreprise')">Entreprise</button>
+        <h2>Créer un compte</h2>
+        <div class="mode-choice">
+            <button type="button" id="mode-perso" class="mode-btn active" onclick="choisirMode('perso')">
+                <i data-lucide="user" style="width:16px;height:16px;margin-right:6px;vertical-align:middle;"></i> Personnel
+            </button>
+            <button type="button" id="mode-entreprise" class="mode-btn" onclick="choisirMode('entreprise')">
+                <i data-lucide="building-2" style="width:16px;height:16px;margin-right:6px;vertical-align:middle;"></i> Entreprise
+            </button>
+        </div>
+        <input type="hidden" id="reg-mode" value="perso">
+        <div class="formulaire" style="margin-top:16px;">
+            <div id="champ-entreprise" style="display:none;">
+                <input type="text" id="reg-nom-entreprise" placeholder="Nom de l'entreprise" autocomplete="organization">
             </div>
-            <input type="hidden" id="reg-mode" value="perso">
-            <input type="text" id="reg-nom" placeholder="Ton nom">
-            <div class="mode-choice">
-                <button type="button" id="mode-perso" class="mode-btn active" onclick="choisirMode('perso')">Personnel</button>
-                <button type="button" id="mode-entreprise" class="mode-btn" onclick="choisirMode('entreprise')">Entreprise</button>
-            </div>
-            <input type="hidden" id="reg-mode" value="perso">
-            <input type="email" id="reg-email" placeholder="Email">
+            <input type="text" id="reg-nom" placeholder="Votre nom complet" autocomplete="name">
+            <input type="email" id="reg-email" placeholder="Adresse email" autocomplete="email">
             <div class="password-field">
-                <input type="password" id="reg-mdp" placeholder="Mot de passe">
+                <input type="password" id="reg-mdp" placeholder="Mot de passe" autocomplete="new-password">
                 <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp', this)"></i>
             </div>
             <div class="password-field">
-                <input type="password" id="reg-mdp2" placeholder="Confirmer le mot de passe">
+                <input type="password" id="reg-mdp2" placeholder="Confirmer le mot de passe" autocomplete="new-password">
                 <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp2', this)"></i>
             </div>
-            <button id="btn-register" class="btn-primary">S'inscrire</button>
-            <p id="reg-erreur" class="erreur"></p>
+            <button id="btn-register" class="btn-primary btn-full">S'inscrire</button>
+            <p id="reg-erreur" class="erreur" style="font-size:13px;font-weight:600;min-height:20px;"></p>
         </div>
-        <p class="auth-link">Deja un compte ? <a href="/login">Se connecter</a></p>
+        <p class="auth-link">Déjà un compte ? <a href="/login">Se connecter</a></p>
     </div>
-
     <script>
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    function togglePassword(inputId, icon) {
-        var input = document.getElementById(inputId);
-        if (input.type === "password") {
-            input.type = "text";
-            icon.setAttribute("data-lucide", "eye-off");
-        } else {
-            input.type = "password";
-            icon.setAttribute("data-lucide", "eye");
-        }
-        lucide.createIcons();
+    function choisirMode(m) {
+        document.getElementById("reg-mode").value = m;
+        document.getElementById("mode-perso").classList.remove("active");
+        document.getElementById("mode-entreprise").classList.remove("active");
+        document.getElementById("mode-" + m).classList.add("active");
+        document.getElementById("champ-entreprise").style.display = (m === 'entreprise') ? 'block' : 'none';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
-    window.choisirMode = function(mode) {
-        document.getElementById("reg-mode").value = mode;
-        document.getElementById("mode-perso").classList.remove("active");
-        document.getElementById("mode-entreprise").classList.remove("active");
-        document.getElementById("mode-" + mode).classList.add("active");
-    };
-    window.choisirMode = function(mode) {
-        document.getElementById("reg-mode").value = mode;
-        document.getElementById("mode-perso").classList.remove("active");
-        document.getElementById("mode-entreprise").classList.remove("active");
-        document.getElementById("mode-" + mode).classList.add("active");
-    };
+
+    function togglePassword(id, icon) {
+        var i = document.getElementById(id);
+        if (i.type === "password") { i.type = "text"; icon.setAttribute("data-lucide", "eye-off"); }
+        else { i.type = "password"; icon.setAttribute("data-lucide", "eye"); }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
 
     document.getElementById("btn-register").addEventListener("click", function() {
-        var nom = document.getElementById("reg-nom").value;
-        var email = document.getElementById("reg-email").value;
+        var mode = document.getElementById("reg-mode").value;
+        var nomEntreprise = mode === 'entreprise' ? document.getElementById("reg-nom-entreprise").value.trim() : "";
+        var nom = document.getElementById("reg-nom").value.trim();
+        var email = document.getElementById("reg-email").value.trim();
         var mdp = document.getElementById("reg-mdp").value;
         var mdp2 = document.getElementById("reg-mdp2").value;
+        var errEl = document.getElementById("reg-erreur");
+        errEl.textContent = "";
+
+        if (mode === 'entreprise' && !nomEntreprise) {
+            errEl.textContent = "Indique le nom de l'entreprise !"; return;
+        }
         if (!nom || !email || !mdp || !mdp2) {
-            document.getElementById("reg-erreur").textContent = "Remplis tous les champs !";
-            return;
+            errEl.textContent = "Remplis tous les champs !"; return;
+        }
+        if (mdp.length < 6) {
+            errEl.textContent = "Le mot de passe doit avoir au moins 6 caractères !"; return;
         }
         if (mdp !== mdp2) {
-            document.getElementById("reg-erreur").textContent = "Les mots de passe ne correspondent pas !";
-            return;
+            errEl.textContent = "Les mots de passe ne correspondent pas !"; return;
         }
+
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = "Inscription...";
+
         fetch("/api/register", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body:JSON.stringify({nom: nom, email: email, mot_de_passe: mdp, mode: document.getElementById("reg-mode").value})
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nom: nom, email: email, mot_de_passe: mdp, mode: mode, nom_entreprise: nomEntreprise })
         })
-
-        .then(function(data) {
-            if (data.succes) {
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.succes) {
                 window.location.href = "/dashboard";
             } else {
-                document.getElementById("reg-erreur").textContent = data.erreur;
+                errEl.textContent = d.erreur;
+                btn.disabled = false;
+                btn.textContent = "S'inscrire";
             }
+        })
+        .catch(function() {
+            errEl.textContent = "Erreur de connexion. Vérifiez que le serveur est lancé.";
+            btn.disabled = false;
+            btn.textContent = "S'inscrire";
         });
     });
     </script>
-
 </body>
 </html>
