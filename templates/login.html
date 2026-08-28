@@ -1,103 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BudgetLab - Connexion</title>
+    <link rel="icon" href="/static/favicon.png">
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/static/favicon.png" type="image/png">
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="/static/icon-192x192.png">
+    <meta name="theme-color" content="#2563eb">
+    <script src="/static/theme.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="login-body">
-    <div class="login-split">
-        <div class="login-left">
+<body>
+    <button class="btn-theme theme-flottant" data-bascule-theme aria-label="Changer de theme" aria-pressed="false"><i data-lucide="moon"></i></button>
+
+    <div class="page-auth">
+        <div class="carte-auth">
             <div class="login-brand-logo">BudgetLab</div>
-            <p class="login-brand-tagline">Gérez vos finances<br>en toute simplicité</p>
-            <p class="login-brand-desc">
-                Une plateforme complète pour les particuliers et les entreprises.<br>
-                Suivez vos revenus, maîtrisez vos dépenses, gérez votre équipe.
-            </p>
-            <div class="login-features-list">
-                <div class="login-feature-item">
-                    <div class="feat-icon">
-                        <i data-lucide="trending-up" style="width:18px;height:18px;color:#3b82f6;"></i>
-                    </div>
-                    <span>Suivi des revenus &amp; dépenses en temps réel</span>
+            <p class="sous-titre-auth">Connectez-vous pour acceder a vos finances</p>
+
+            <div class="formulaire">
+                <div>
+                    <label for="login-email">Adresse email</label>
+                    <input type="email" id="login-email" placeholder="vous@exemple.com" autocomplete="email" autofocus>
                 </div>
-                <div class="login-feature-item">
-                    <div class="feat-icon">
-                        <i data-lucide="users" style="width:18px;height:18px;color:#3b82f6;"></i>
-                    </div>
-                    <span>Gestion des employés &amp; fiches de paie PDF</span>
-                </div>
-                <div class="login-feature-item">
-                    <div class="feat-icon">
-                        <i data-lucide="bar-chart-2" style="width:18px;height:18px;color:#3b82f6;"></i>
-                    </div>
-                    <span>Rapports &amp; analyses financiers détaillés</span>
-                </div>
-                <div class="login-feature-item">
-                    <div class="feat-icon">
-                        <i data-lucide="shield-check" style="width:18px;height:18px;color:#3b82f6;"></i>
-                    </div>
-                    <span>Données sécurisées, accès personnel ou entreprise</span>
-                </div>
-            </div>
-        </div>
-        <div class="login-right">
-            <div class="login-right-inner">
-                <h2>Bon retour !</h2>
-                <p class="login-right-subtitle">Connectez-vous à votre espace financier</p>
-                <div class="formulaire">
-                    <input type="email" id="login-email" placeholder="Votre adresse email" autocomplete="email">
+                <div>
+                    <label for="login-mdp">Mot de passe</label>
                     <div class="password-field">
-                        <input type="password" id="login-mdp" placeholder="Mot de passe" autocomplete="current-password">
+                        <input type="password" id="login-mdp" placeholder="Votre mot de passe" autocomplete="current-password">
                         <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('login-mdp', this)"></i>
                     </div>
-                    <button id="btn-login" class="btn-primary btn-full">Se connecter</button>
-                    <p id="login-erreur" class="erreur"></p>
                 </div>
-                <p class="auth-link" style="margin-top:28px;">
-                    Pas encore de compte ? <a href="/register">Créer un compte</a>
-                </p>
+                <button id="btn-login" class="btn-primary">Se connecter</button>
+                <p id="login-erreur" class="erreur-auth"></p>
             </div>
+
+            <p class="lien-bas">
+                Pas encore de compte ? <a href="/register">Creer un compte</a><br>
+                <a href="/">Consulter la documentation</a>
+            </p>
         </div>
     </div>
+
     <script>
     if (typeof lucide !== 'undefined') lucide.createIcons();
+
     function togglePassword(id, icon) {
         var i = document.getElementById(id);
         if (i.type === "password") { i.type = "text"; icon.setAttribute("data-lucide", "eye-off"); }
         else { i.type = "password"; icon.setAttribute("data-lucide", "eye"); }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
-    document.getElementById("btn-login").addEventListener("click", function() {
+
+    var btn = document.getElementById("btn-login");
+    var errEl = document.getElementById("login-erreur");
+
+    function terminer(message) {
+        errEl.textContent = message;
+        btn.disabled = false;
+        btn.textContent = "Se connecter";
+    }
+
+    function envoyer() {
         var email = document.getElementById("login-email").value.trim();
         var mdp = document.getElementById("login-mdp").value;
-        var errEl = document.getElementById("login-erreur");
         errEl.textContent = "";
-        if (!email || !mdp) { errEl.textContent = "Remplis tous les champs !"; return; }
-        var btn = this;
+        if (!email || !mdp) { errEl.textContent = "Renseignez votre email et votre mot de passe."; return; }
+
         btn.disabled = true;
         btn.textContent = "Connexion...";
+
         fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: email, mot_de_passe: mdp })
         })
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-            if (d.succes) { window.location.href = "/dashboard"; }
-            else { errEl.textContent = d.erreur; btn.disabled = false; btn.textContent = "Se connecter"; }
+        .then(function (r) {
+            // Une reponse d'erreur peut ne pas etre du JSON : on distingue alors
+            // un probleme serveur d'un serveur injoignable.
+            return r.json().then(function (d) { return d; }).catch(function () {
+                return { erreur: "Le serveur a renvoye une reponse inattendue (code " + r.status + ")." };
+            });
         })
-        .catch(function() {
-            errEl.textContent = "Erreur de connexion. Vérifiez que le serveur est lancé.";
-            btn.disabled = false;
-            btn.textContent = "Se connecter";
+        .then(function (d) {
+            if (d.succes) { window.location.href = "/dashboard"; }
+            else { terminer(d.erreur || "Connexion impossible."); }
+        })
+        .catch(function () {
+            terminer("Impossible de joindre le serveur. Verifiez votre connexion.");
+        });
+    }
+
+    btn.addEventListener("click", envoyer);
+    ["login-email", "login-mdp"].forEach(function (id) {
+        document.getElementById(id).addEventListener("keydown", function (e) {
+            if (e.key === "Enter") envoyer();
         });
     });
     </script>

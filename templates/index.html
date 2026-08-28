@@ -1,202 +1,274 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BudgetLab - Enterprise</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/static/favicon.png" type="image/png">
+    <title>BudgetLab</title>
+    <link rel="icon" href="/static/favicon.png">
     <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="/static/icon-192x192.png">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/theme.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="dashboard-body">
-
-    <button class="hamburger" id="btn-menu">
-        <i data-lucide="menu" class="icon"></i>
-    </button>
+<body>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    <div class="sidebar" id="sidebar">
+
+    <nav class="sidebar" id="sidebar">
         <h2>BudgetLab</h2>
-        <a href="#" class="active" onclick="changerPage('dashboard')"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard</a>
+        <a href="#" class="active" onclick="changerPage('dashboard')"><i data-lucide="layout-dashboard" class="icon"></i> Tableau de bord</a>
         <a href="#" onclick="changerPage('transactions')"><i data-lucide="arrow-left-right" class="icon"></i> Transactions</a>
+        <a href="#" onclick="changerPage('budgets')"><i data-lucide="target" class="icon"></i> Budgets</a>
+        <a href="#" onclick="changerPage('recurrences')"><i data-lucide="repeat" class="icon"></i> Echeances</a>
         {% if user_mode == 'entreprise' %}
         <a href="#" onclick="changerPage('employes')"><i data-lucide="users" class="icon"></i> Employes</a>
         <a href="#" onclick="changerPage('salaires')"><i data-lucide="banknote" class="icon"></i> Salaires</a>
         {% endif %}
         <a href="#" onclick="changerPage('parametres')"><i data-lucide="settings" class="icon"></i> Parametres</a>
-    </div>
+        {% if est_admin %}
+        <a href="/admin"><i data-lucide="shield" class="icon"></i> Administration</a>
+        {% endif %}
+        <a href="#" id="lien-logout" class="logout-link"><i data-lucide="log-out" class="icon"></i> Deconnexion</a>
+    </nav>
 
-    <div class="main">
-
-        <div class="header">
-            <h1 id="titre-page">Bonjour, {{ user_nom }}</h1>
-            <div class="theme-buttons">
-                <button id="btn-clair" class="btn-actif"><i data-lucide="sun" class="icon-sm"></i> Clair</button>
-                <button id="btn-sombre"><i data-lucide="moon" class="icon-sm"></i> Sombre</button>
+    <div class="contenu">
+        <header class="entete-page">
+            <div style="display:flex;align-items:center;gap:12px">
+                <button id="btn-menu" aria-label="Ouvrir le menu"><i data-lucide="menu" class="icon"></i></button>
+                <h1 id="titre-page">Bonjour, {{ user_nom }}</h1>
             </div>
-        </div>
+            <div class="actions-entete">
+                <div class="bascule-theme">
+                    <button id="btn-clair" class="btn-actif"><i data-lucide="sun" class="icon-sm"></i> Clair</button>
+                    <button id="btn-sombre"><i data-lucide="moon" class="icon-sm"></i> Sombre</button>
+                </div>
+                <button id="btn-refresh" class="btn-secondary" aria-label="Actualiser"><i data-lucide="refresh-cw" class="icon-sm"></i></button>
+            </div>
+        </header>
 
-        <!-- PAGE DASHBOARD -->
+        <!-- ============================================ tableau de bord -->
         <div id="page-dashboard" class="page">
-            {% if user_mode == 'entreprise' %}
-            <div class="cartes" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="carte carte-revenus"><h3>Chiffre d'affaires</h3><p id="val-ca">0 FCFA</p></div>
-                <div class="carte carte-depenses"><h3>Depenses</h3><p id="val-depenses">0 FCFA</p></div>
-                <div class="carte carte-solde"><h3>Benefice</h3><p id="val-benefice">0 FCFA</p></div>
-                <div class="carte" style="border-top-color:#8b5cf6;"><h3>Masse salariale</h3><p id="val-masse">0 FCFA</p></div>
-                <div class="carte" style="border-top-color:#ec4899;"><h3>Employes actifs</h3><p id="val-employes">0</p></div>
-                <div class="carte carte-transactions"><h3>Transactions</h3><p id="val-transactions">0</p></div>
+            <div class="cartes">
+                {% if user_mode == 'entreprise' %}
+                <div class="carte" style="border-top-color:#2563eb"><h3>Chiffre d'affaires</h3><p id="val-ca">0</p></div>
+                <div class="carte" style="border-top-color:#ef4444"><h3>Depenses</h3><p id="val-depenses">0</p></div>
+                <div class="carte" style="border-top-color:#10b981"><h3>Benefice</h3><p id="val-benefice">0</p></div>
+                <div class="carte" style="border-top-color:#8b5cf6"><h3>Masse salariale</h3><p id="val-masse">0</p></div>
+                <div class="carte" style="border-top-color:#ec4899"><h3>Employes actifs</h3><p id="val-employes">0</p></div>
+                <div class="carte" style="border-top-color:#f59e0b"><h3>Transactions</h3><p id="val-transactions">0</p></div>
+                {% else %}
+                <div class="carte" style="border-top-color:#2563eb"><h3>Solde</h3><p id="val-solde">0</p></div>
+                <div class="carte" style="border-top-color:#10b981"><h3>Revenus</h3><p id="val-revenus-perso">0</p></div>
+                <div class="carte" style="border-top-color:#ef4444"><h3>Depenses</h3><p id="val-depenses-perso">0</p></div>
+                <div class="carte" style="border-top-color:#f59e0b"><h3>Transactions</h3><p id="val-transactions-perso">0</p></div>
+                {% endif %}
             </div>
-            {% else %}
-            <div class="cartes" style="grid-template-columns: repeat(4, 1fr);">
-                <div class="carte carte-solde"><h3>Solde</h3><p id="val-solde">0 FCFA</p></div>
-                <div class="carte carte-revenus"><h3>Revenus</h3><p id="val-revenus-perso">0 FCFA</p></div>
-                <div class="carte carte-depenses"><h3>Depenses</h3><p id="val-depenses-perso">0 FCFA</p></div>
-                <div class="carte carte-transactions"><h3>Transactions</h3><p id="val-transactions-perso">0</p></div>
-            </div>
-            {% endif %}
+
             <div class="graphiques">
-                <div class="graphique-box"><h3>{% if user_mode == 'entreprise' %}Revenus vs Depenses par mois{% else %}Evolution mensuelle{% endif %}</h3><canvas id="graphique-mensuel"></canvas></div>
-                <div class="graphique-box"><h3>Depenses par categorie</h3><canvas id="graphique-depenses"></canvas></div>
-            </div>
-        </div>
-            <div class="graphiques">
-                <div class="graphique-box"><h3>Revenus vs Depenses par mois</h3><canvas id="graphique-mensuel"></canvas></div>
-                <div class="graphique-box"><h3>Depenses par categorie</h3><canvas id="graphique-depenses"></canvas></div>
+                <div class="bloc"><h3>Revenus et depenses par mois</h3><canvas id="graphique-mensuel"></canvas></div>
+                <div class="bloc"><h3>Repartition des depenses</h3><canvas id="graphique-depenses"></canvas></div>
             </div>
         </div>
 
-        <!-- PAGE TRANSACTIONS -->
-        <div id="page-transactions" class="page" style="display:none;">
-            <div class="section-transactions" style="margin-bottom:20px;">
+        <!-- =============================================== transactions -->
+        <div id="page-transactions" class="page" style="display:none">
+            <div class="bloc" style="margin-bottom:18px">
                 <h3>Ajouter une transaction</h3>
-                <div class="formulaire" style="flex-direction:row; flex-wrap:wrap; gap:10px; margin-top:10px;">
-                    <select id="form-type" style="flex:1; min-width:120px;">
-                        <option value="revenu">Revenu</option>
-                        <option value="depense">Depense</option>
-                        <option value="facture">Facture client</option>
-                    </select>
-                    <input type="text" id="form-categorie" placeholder="Categorie" style="flex:1; min-width:120px;">
-                    <input type="number" id="form-montant" placeholder="Montant (FCFA)" style="flex:1; min-width:120px;">
-                    <input type="text" id="form-description" placeholder="Description" style="flex:2; min-width:150px;">
-                    <button id="btn-ajouter" style="min-width:100px;">Ajouter</button>
+                <div class="formulaire form-row">
+                    <select id="form-type" aria-label="Type">{% if user_mode == 'entreprise' %}<option value="revenu">Revenu</option><option value="depense">Depense</option><option value="facture">Facture client</option>{% else %}<option value="revenu">Revenu</option><option value="depense">Depense</option>{% endif %}</select>
+                    <input type="text" id="form-categorie" placeholder="Categorie" list="liste-categories">
+                    <input type="number" id="form-montant" placeholder="Montant">
+                    <input type="text" id="form-description" placeholder="Description">
+                    <button id="btn-ajouter" class="btn-primary"><i data-lucide="plus" class="icon-sm"></i> Ajouter</button>
                 </div>
             </div>
+
             <div class="filtres">
-                <select id="filtre-type"><option value="">Tous les types</option><option value="revenu">Revenu</option><option value="depense">Depense</option><option value="facture">Facture</option></select>
-                <select id="filtre-categorie"><option value="">Toutes categories</option></select>
-                <input type="date" id="filtre-date-debut">
-                <input type="date" id="filtre-date-fin">
-                <button id="btn-filtrer">Filtrer</button>
-                <button id="btn-reset" class="btn-secondary">Reset</button>
+                <select id="filtre-type" aria-label="Filtrer par type"><option value="">Tous types</option><option value="revenu">Revenu</option><option value="depense">Depense</option>{% if user_mode == 'entreprise' %}<option value="facture">Facture</option>{% endif %}</select>
+                <select id="filtre-categorie" aria-label="Filtrer par categorie"><option value="">Toutes categories</option></select>
+                <input type="date" id="filtre-date-debut" aria-label="Date de debut">
+                <input type="date" id="filtre-date-fin" aria-label="Date de fin">
+                <input type="text" id="filtre-recherche" placeholder="Rechercher...">
+                <button id="btn-filtrer" class="btn-primary"><i data-lucide="search" class="icon-sm"></i> Filtrer</button>
+                <button id="btn-reset" class="btn-secondary">Reinitialiser</button>
+                <button id="btn-export" class="btn-secondary"><i data-lucide="download" class="icon-sm"></i> Exporter CSV</button>
             </div>
-            <div class="section-transactions">
-                <h3>Historique des transactions</h3>
-                <div id="liste-transactions">Chargement...</div>
+
+            <div class="bloc">
+                <h3>Historique <span id="trans-total" style="font-weight:400;color:var(--texte-faible);font-size:.88rem"></span></h3>
+                <div id="liste-transactions" class="etat-vide">Chargement...</div>
+                <div id="pagination" style="display:none">
+                    <button id="btn-page-prec" class="btn-secondary"><i data-lucide="chevron-left" class="icon-sm"></i> Precedent</button>
+                    <span id="page-info"></span>
+                    <button id="btn-page-suiv" class="btn-secondary">Suivant <i data-lucide="chevron-right" class="icon-sm"></i></button>
+                </div>
             </div>
         </div>
 
-        <!-- PAGE EMPLOYES -->
-        <div id="page-employes" class="page" style="display:none;">
-            <div class="section-transactions" style="margin-bottom:20px;">
+        <!-- ==================================================== budgets -->
+        <div id="page-budgets" class="page" style="display:none">
+            <div class="bloc" style="margin-bottom:18px">
+                <h3>Definir un budget mensuel</h3>
+                <p style="color:var(--texte-doux);font-size:.88rem;margin:-6px 0 12px">
+                    Fixez un plafond par categorie de depenses. La barre passe a l'orange a 80 %, puis au rouge en cas de depassement.
+                </p>
+                <div class="formulaire form-row">
+                    <input type="text" id="budget-categorie" placeholder="Categorie" list="liste-categories">
+                    <datalist id="liste-categories"></datalist>
+                    <input type="number" id="budget-montant" placeholder="Plafond mensuel">
+                    <button id="btn-ajouter-budget" class="btn-primary"><i data-lucide="check" class="icon-sm"></i> Enregistrer</button>
+                </div>
+                <p id="budget-msg" class="msg"></p>
+            </div>
+
+            <div class="bloc">
+                <h3 style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    Suivi du mois
+                    <input type="month" id="budget-mois" style="width:auto;font-weight:400">
+                </h3>
+                <div id="liste-budgets" class="etat-vide">Chargement...</div>
+            </div>
+        </div>
+
+        <!-- ================================================== echeances -->
+        <div id="page-recurrences" class="page" style="display:none">
+            <div class="bloc" style="margin-bottom:18px">
+                <h3>Nouvelle echeance recurrente</h3>
+                <p style="color:var(--texte-doux);font-size:.88rem;margin:-6px 0 12px">
+                    La transaction sera creee automatiquement chaque mois, au jour choisi. Ideal pour un loyer ou un abonnement.
+                </p>
+                <div class="formulaire form-row">
+                    <select id="rec-type" aria-label="Type">{% if user_mode == 'entreprise' %}<option value="depense">Depense</option><option value="revenu">Revenu</option><option value="facture">Facture client</option>{% else %}<option value="depense">Depense</option><option value="revenu">Revenu</option>{% endif %}</select>
+                    <input type="text" id="rec-categorie" placeholder="Categorie" list="liste-categories">
+                    <input type="number" id="rec-montant" placeholder="Montant">
+                    <input type="text" id="rec-description" placeholder="Description">
+                    <input type="number" id="rec-jour" placeholder="Jour (1-28)" min="1" max="28" value="1">
+                    <button id="btn-ajouter-rec" class="btn-primary"><i data-lucide="plus" class="icon-sm"></i> Ajouter</button>
+                </div>
+                <p id="rec-msg" class="msg"></p>
+            </div>
+
+            <div class="bloc">
+                <h3>Mes echeances</h3>
+                <div id="liste-recurrences" class="etat-vide">Chargement...</div>
+            </div>
+        </div>
+
+        {% if user_mode == 'entreprise' %}
+        <!-- =================================================== employes -->
+        <div id="page-employes" class="page" style="display:none">
+            <div class="bloc" style="margin-bottom:18px">
                 <h3>Ajouter un employe</h3>
-                <div class="formulaire" style="flex-direction:row; flex-wrap:wrap; gap:10px; margin-top:10px;">
-                    <input type="text" id="emp-nom" placeholder="Nom complet" style="flex:1; min-width:150px;">
-                    <input type="text" id="emp-poste" placeholder="Poste" style="flex:1; min-width:120px;">
-                    <input type="text" id="emp-dept" placeholder="Departement" style="flex:1; min-width:120px;">
-                    <input type="number" id="emp-salaire" placeholder="Salaire base (FCFA)" style="flex:1; min-width:140px;">
-                    <input type="email" id="emp-email" placeholder="Email" style="flex:1; min-width:150px;">
-                    <input type="tel" id="emp-tel" placeholder="Telephone" style="flex:1; min-width:120px;">
-                    <button id="btn-ajouter-emp" class="btn-primary" style="min-width:100px;">Ajouter</button>
+                <div class="formulaire form-row">
+                    <input type="text" id="emp-nom" placeholder="Nom complet">
+                    <input type="text" id="emp-poste" placeholder="Poste">
+                    <input type="text" id="emp-dept" placeholder="Departement">
+                    <input type="number" id="emp-salaire" placeholder="Salaire de base">
+                    <input type="email" id="emp-email" placeholder="Email">
+                    <input type="tel" id="emp-tel" placeholder="Telephone">
+                    <button id="btn-ajouter-emp" class="btn-primary"><i data-lucide="user-plus" class="icon-sm"></i> Ajouter</button>
                 </div>
             </div>
-            <div class="section-transactions">
-                <h3>Liste des employes</h3>
-                <div id="liste-employes">Chargement...</div>
-            </div>
+            <div class="bloc"><h3>Equipe</h3><div id="liste-employes" class="etat-vide">Chargement...</div></div>
         </div>
 
-        <!-- PAGE SALAIRES -->
-        <div id="page-salaires" class="page" style="display:none;">
-            <div class="section-transactions" style="margin-bottom:20px;">
-                <h3>Generer les salaires du mois</h3>
-                <div class="formulaire" style="flex-direction:row; gap:10px; margin-top:10px; align-items:center;">
-                    <input type="month" id="sal-mois" style="flex:1;">
-                    <button id="btn-generer-sal" class="btn-primary">Generer</button>
-                    <button id="btn-payer-tous" style="background-color:#10b981; color:white; border:none; border-radius:8px; padding:12px 20px; cursor:pointer;">Payer tous</button>
+        <!-- =================================================== salaires -->
+        <div id="page-salaires" class="page" style="display:none">
+            <div class="bloc" style="margin-bottom:18px">
+                <h3>Salaires du mois</h3>
+                <p style="color:var(--texte-doux);font-size:.88rem;margin:-6px 0 12px">
+                    Relancer la generation sur un mois deja traite ajoute uniquement les fiches manquantes.
+                </p>
+                <div class="formulaire form-row">
+                    <input type="month" id="sal-mois" aria-label="Mois">
+                    <button id="btn-generer-sal" class="btn-primary"><i data-lucide="file-plus" class="icon-sm"></i> Generer</button>
+                    <button id="btn-payer-tous" style="background:var(--vert)"><i data-lucide="check-check" class="icon-sm"></i> Payer tous</button>
                 </div>
-                <p id="sal-msg" class="msg" style="margin-top:10px;"></p>
+                <p id="sal-msg" class="msg"></p>
             </div>
-            <div class="section-transactions">
-                <h3>Fiches de salaire</h3>
-                <div id="liste-salaires">Chargement...</div>
-            </div>
+            <div class="bloc"><h3>Fiches de salaire</h3><div id="liste-salaires" class="etat-vide">Chargement...</div></div>
         </div>
+        {% endif %}
 
-        <!-- PAGE PARAMETRES -->
-        <div id="page-parametres" class="page" style="display:none;">
+        <!-- ================================================= parametres -->
+        <div id="page-parametres" class="page" style="display:none">
             <div class="settings-grid">
                 <div class="settings-card">
-                    <h3><i data-lucide="user" class="icon"></i> Mon Profil</h3>
+                    <h3><i data-lucide="user" class="icon"></i> Mon profil</h3>
                     <div class="formulaire">
-                        <label>Nom</label>
-                        <input type="text" id="param-nom" placeholder="Ton nom">
-                        <label>Email</label>
-                        <input type="email" id="param-email" placeholder="Ton email">
+                        <div><label for="param-nom">Nom</label><input type="text" id="param-nom"></div>
+                        <div><label for="param-email">Email</label><input type="email" id="param-email"></div>
+                        <div><label for="param-devise">Devise</label>
+                            <select id="param-devise">
+                                <option value="FCFA">FCFA</option><option value="EUR">EUR</option>
+                                <option value="USD">USD</option><option value="GBP">GBP</option>
+                                <option value="CAD">CAD</option><option value="CHF">CHF</option>
+                                <option value="MAD">MAD</option><option value="TND">TND</option>
+                                <option value="XOF">XOF</option><option value="XAF">XAF</option>
+                            </select>
+                        </div>
                         <button id="btn-save-profil" class="btn-primary">Sauvegarder</button>
                         <p id="profil-msg" class="msg"></p>
                     </div>
                 </div>
+
                 <div class="settings-card">
-                    <h3><i data-lucide="lock" class="icon"></i> Changer le mot de passe</h3>
+                    <h3><i data-lucide="lock" class="icon"></i> Mot de passe</h3>
                     <div class="formulaire">
-                        <div class="password-field">
-                            <input type="password" id="param-ancien-mdp" placeholder="Ancien mot de passe">
-                            <i data-lucide="eye" class="toggle-password-icon" onclick="togglePasswordDash('param-ancien-mdp', this)"></i>
-                        </div>
-                        <div class="password-field">
-                            <input type="password" id="param-nouveau-mdp" placeholder="Nouveau mot de passe">
-                            <i data-lucide="eye" class="toggle-password-icon" onclick="togglePasswordDash('param-nouveau-mdp', this)"></i>
-                        </div>
-                        <div class="password-field">
-                            <input type="password" id="param-confirm-mdp" placeholder="Confirmer le nouveau">
-                            <i data-lucide="eye" class="toggle-password-icon" onclick="togglePasswordDash('param-confirm-mdp', this)"></i>
-                        </div>
-                        <button id="btn-change-mdp" class="btn-primary">Changer le mot de passe</button>
+                        <div class="password-field"><input type="password" id="param-ancien-mdp" placeholder="Mot de passe actuel"><i data-lucide="eye" class="toggle-password-icon" onclick="togglePasswordDash('param-ancien-mdp',this)"></i></div>
+                        <div class="password-field"><input type="password" id="param-nouveau-mdp" placeholder="Nouveau (8 caracteres min.)"><i data-lucide="eye" class="toggle-password-icon" onclick="togglePasswordDash('param-nouveau-mdp',this)"></i></div>
+                        <div class="password-field"><input type="password" id="param-confirm-mdp" placeholder="Confirmer"><i data-lucide="eye" class="toggle-password-icon" onclick="togglePasswordDash('param-confirm-mdp',this)"></i></div>
+                        <button id="btn-change-mdp" class="btn-primary">Changer</button>
                         <p id="mdp-msg" class="msg"></p>
                     </div>
                 </div>
+
                 <div class="settings-card danger-zone">
                     <h3><i data-lucide="alert-triangle" class="icon"></i> Zone dangereuse</h3>
-                    <p>Supprimer ton compte et toutes tes donnees. Cette action est irreversible.</p>
+                    <p>La suppression efface definitivement vos transactions, budgets, echeances, employes et fiches de paie. Pensez a exporter vos donnees avant.</p>
                     <button id="btn-supprimer-compte" class="btn-danger">Supprimer mon compte</button>
                 </div>
             </div>
         </div>
 
-        <!-- POPUP MODIFIER TRANSACTION -->
-        <div id="popup-modifier" class="popup-overlay" style="display:none;">
+        <!-- ===================================================== popups -->
+        <div id="popup-modifier" class="popup-overlay">
             <div class="popup-box">
                 <h3>Modifier la transaction</h3>
                 <div class="formulaire">
                     <input type="hidden" id="edit-id">
                     <select id="edit-type"><option value="revenu">Revenu</option><option value="depense">Depense</option><option value="facture">Facture</option></select>
                     <input type="text" id="edit-categorie" placeholder="Categorie">
-                    <input type="number" id="edit-montant" placeholder="Montant (FCFA)">
+                    <input type="number" id="edit-montant" placeholder="Montant">
                     <input type="text" id="edit-description" placeholder="Description">
                     <div class="popup-buttons">
-                        <button id="btn-sauvegarder">Sauvegarder</button>
+                        <button id="btn-sauvegarder" class="btn-primary">Sauvegarder</button>
                         <button id="btn-annuler" class="btn-secondary">Annuler</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- POPUP MODIFIER EMPLOYE -->
-        <div id="popup-modifier-emp" class="popup-overlay" style="display:none;">
+        {% if user_mode == 'entreprise' %}
+        <div id="popup-modifier-sal" class="popup-overlay">
+            <div class="popup-box">
+                <h3>Bonus et deductions</h3>
+                <div class="formulaire">
+                    <input type="hidden" id="edit-sal-id">
+                    <p id="edit-sal-info" style="color:var(--texte-doux);font-size:.88rem;margin:0"></p>
+                    <div><label for="edit-sal-bonus">Bonus</label><input type="number" id="edit-sal-bonus" min="0" value="0"></div>
+                    <div><label for="edit-sal-deductions">Deductions</label><input type="number" id="edit-sal-deductions" min="0" value="0"></div>
+                    <p id="edit-sal-net" style="font-weight:700;margin:4px 0 0"></p>
+                    <p id="edit-sal-msg" class="msg"></p>
+                    <div class="popup-buttons">
+                        <button id="btn-save-sal" class="btn-primary">Sauvegarder</button>
+                        <button id="btn-annuler-sal" class="btn-secondary">Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="popup-modifier-emp" class="popup-overlay">
             <div class="popup-box">
                 <h3>Modifier l'employe</h3>
                 <div class="formulaire">
@@ -204,25 +276,25 @@
                     <input type="text" id="edit-emp-nom" placeholder="Nom">
                     <input type="text" id="edit-emp-poste" placeholder="Poste">
                     <input type="text" id="edit-emp-dept" placeholder="Departement">
-                    <input type="number" id="edit-emp-salaire" placeholder="Salaire base (FCFA)">
+                    <input type="number" id="edit-emp-salaire" placeholder="Salaire de base">
                     <input type="email" id="edit-emp-email" placeholder="Email">
                     <input type="tel" id="edit-emp-tel" placeholder="Telephone">
                     <div class="popup-buttons">
-                        <button id="btn-save-emp">Sauvegarder</button>
+                        <button id="btn-save-emp" class="btn-primary">Sauvegarder</button>
                         <button id="btn-annuler-emp" class="btn-secondary">Annuler</button>
                     </div>
                 </div>
             </div>
         </div>
-
+        {% endif %}
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>var USER_MODE="{{ user_mode }}";</script>
     <script src="/static/script.js"></script>
     <script>
-    lucide.createIcons();
-    var USER_MODE = "{{ user_mode }}";
-    if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/static/sw.js"); }
+        lucide.createIcons();
+        if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/static/sw.js"); }
     </script>
 </body>
-</html>     
+</html>

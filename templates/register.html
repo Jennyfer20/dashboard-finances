@@ -1,49 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BudgetLab - Inscription</title>
+    <link rel="icon" href="/static/favicon.png">
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/static/favicon.png" type="image/png">
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="/static/icon-192x192.png">
+    <meta name="theme-color" content="#2563eb">
+    <script src="/static/theme.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .choix-mode { display: flex; gap: 10px; }
+        .choix-mode > div {
+            flex: 1;
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon-sm);
+            padding: 13px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .18s ease, background .18s ease;
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--texte-doux);
+        }
+        .choix-mode > div:hover { border-color: var(--bleu-clair); }
+        .choix-mode > div.active { border-color: var(--bleu); background: var(--bleu-pale); color: var(--bleu); }
+        .choix-mode i { display: block; margin: 0 auto 5px; width: 19px; height: 19px; }
+    </style>
 </head>
-<body class="auth-body">
-    <div class="auth-box">
-        <h1 class="logo">BudgetLab</h1>
-        <h2>Créer un compte</h2>
-        <div class="mode-choice">
-            <button type="button" id="mode-perso" class="mode-btn active" onclick="choisirMode('perso')">
-                <i data-lucide="user" style="width:16px;height:16px;margin-right:6px;vertical-align:middle;"></i> Personnel
-            </button>
-            <button type="button" id="mode-entreprise" class="mode-btn" onclick="choisirMode('entreprise')">
-                <i data-lucide="building-2" style="width:16px;height:16px;margin-right:6px;vertical-align:middle;"></i> Entreprise
-            </button>
+<body>
+    <button class="btn-theme theme-flottant" data-bascule-theme aria-label="Changer de theme" aria-pressed="false"><i data-lucide="moon"></i></button>
+
+    <div class="page-auth">
+        <div class="carte-auth">
+            <div class="logo">BudgetLab</div>
+            <p class="sous-titre-auth">Creez votre compte en quelques secondes</p>
+
+            <div class="formulaire">
+                <div>
+                    <label>Type de compte</label>
+                    <div class="choix-mode">
+                        <div id="mode-perso" class="active" onclick="choisirMode('perso')">
+                            <i data-lucide="user"></i> Personnel
+                        </div>
+                        <div id="mode-entreprise" onclick="choisirMode('entreprise')">
+                            <i data-lucide="building-2"></i> Entreprise
+                        </div>
+                    </div>
+                    <input type="hidden" id="reg-mode" value="perso">
+                </div>
+
+                <div id="champ-entreprise" style="display:none">
+                    <label for="reg-nom-entreprise">Nom de l'entreprise</label>
+                    <input type="text" id="reg-nom-entreprise" placeholder="Votre societe">
+                </div>
+
+                <div>
+                    <label for="reg-nom">Votre nom</label>
+                    <input type="text" id="reg-nom" placeholder="Prenom et nom" autocomplete="name">
+                </div>
+                <div>
+                    <label for="reg-email">Adresse email</label>
+                    <input type="email" id="reg-email" placeholder="vous@exemple.com" autocomplete="email">
+                </div>
+                <div>
+                    <label for="reg-mdp">Mot de passe</label>
+                    <div class="password-field">
+                        <input type="password" id="reg-mdp" placeholder="8 caracteres minimum" autocomplete="new-password">
+                        <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp', this)"></i>
+                    </div>
+                </div>
+                <div>
+                    <label for="reg-mdp2">Confirmation</label>
+                    <div class="password-field">
+                        <input type="password" id="reg-mdp2" placeholder="Repetez le mot de passe" autocomplete="new-password">
+                        <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp2', this)"></i>
+                    </div>
+                </div>
+
+                <button id="btn-register" class="btn-primary">S'inscrire</button>
+                <p id="reg-erreur" class="erreur-auth"></p>
+            </div>
+
+            <p class="lien-bas">
+                Deja un compte ? <a href="/login">Se connecter</a><br>
+                <a href="/">Consulter la documentation</a>
+            </p>
         </div>
-        <input type="hidden" id="reg-mode" value="perso">
-        <div class="formulaire" style="margin-top:16px;">
-            <div id="champ-entreprise" style="display:none;">
-                <input type="text" id="reg-nom-entreprise" placeholder="Nom de l'entreprise" autocomplete="organization">
-            </div>
-            <input type="text" id="reg-nom" placeholder="Votre nom complet" autocomplete="name">
-            <input type="email" id="reg-email" placeholder="Adresse email" autocomplete="email">
-            <div class="password-field">
-                <input type="password" id="reg-mdp" placeholder="Mot de passe" autocomplete="new-password">
-                <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp', this)"></i>
-            </div>
-            <div class="password-field">
-                <input type="password" id="reg-mdp2" placeholder="Confirmer le mot de passe" autocomplete="new-password">
-                <i data-lucide="eye" class="toggle-password-icon" onclick="togglePassword('reg-mdp2', this)"></i>
-            </div>
-            <button id="btn-register" class="btn-primary btn-full">S'inscrire</button>
-            <p id="reg-erreur" class="erreur" style="font-size:13px;font-weight:600;min-height:20px;"></p>
-        </div>
-        <p class="auth-link">Déjà un compte ? <a href="/login">Se connecter</a></p>
     </div>
+
     <script>
     if (typeof lucide !== 'undefined') lucide.createIcons();
 
@@ -63,30 +108,30 @@
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    document.getElementById("btn-register").addEventListener("click", function() {
+    var btn = document.getElementById("btn-register");
+    var errEl = document.getElementById("reg-erreur");
+
+    function terminer(message) {
+        errEl.textContent = message;
+        btn.disabled = false;
+        btn.textContent = "S'inscrire";
+    }
+
+    btn.addEventListener("click", function () {
         var mode = document.getElementById("reg-mode").value;
         var nomEntreprise = mode === 'entreprise' ? document.getElementById("reg-nom-entreprise").value.trim() : "";
         var nom = document.getElementById("reg-nom").value.trim();
         var email = document.getElementById("reg-email").value.trim();
         var mdp = document.getElementById("reg-mdp").value;
         var mdp2 = document.getElementById("reg-mdp2").value;
-        var errEl = document.getElementById("reg-erreur");
         errEl.textContent = "";
 
-        if (mode === 'entreprise' && !nomEntreprise) {
-            errEl.textContent = "Indique le nom de l'entreprise !"; return;
-        }
-        if (!nom || !email || !mdp || !mdp2) {
-            errEl.textContent = "Remplis tous les champs !"; return;
-        }
-        if (mdp.length < 6) {
-            errEl.textContent = "Le mot de passe doit avoir au moins 6 caractères !"; return;
-        }
-        if (mdp !== mdp2) {
-            errEl.textContent = "Les mots de passe ne correspondent pas !"; return;
-        }
+        if (mode === 'entreprise' && !nomEntreprise) { errEl.textContent = "Indiquez le nom de l'entreprise."; return; }
+        if (!nom || !email || !mdp || !mdp2) { errEl.textContent = "Remplissez tous les champs."; return; }
+        // Meme regle que le serveur : en deca, l'inscription serait refusee.
+        if (mdp.length < 8) { errEl.textContent = "Le mot de passe doit contenir au moins 8 caracteres."; return; }
+        if (mdp !== mdp2) { errEl.textContent = "Les mots de passe ne correspondent pas."; return; }
 
-        var btn = this;
         btn.disabled = true;
         btn.textContent = "Inscription...";
 
@@ -95,20 +140,17 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nom: nom, email: email, mot_de_passe: mdp, mode: mode, nom_entreprise: nomEntreprise })
         })
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-            if (d.succes) {
-                window.location.href = "/dashboard";
-            } else {
-                errEl.textContent = d.erreur;
-                btn.disabled = false;
-                btn.textContent = "S'inscrire";
-            }
+        .then(function (r) {
+            return r.json().then(function (d) { return d; }).catch(function () {
+                return { erreur: "Le serveur a renvoye une reponse inattendue (code " + r.status + ")." };
+            });
         })
-        .catch(function() {
-            errEl.textContent = "Erreur de connexion. Vérifiez que le serveur est lancé.";
-            btn.disabled = false;
-            btn.textContent = "S'inscrire";
+        .then(function (d) {
+            if (d.succes) { window.location.href = "/dashboard"; }
+            else { terminer(d.erreur || "Inscription impossible."); }
+        })
+        .catch(function () {
+            terminer("Impossible de joindre le serveur. Verifiez votre connexion.");
         });
     });
     </script>

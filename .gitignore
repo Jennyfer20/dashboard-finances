@@ -1,3 +1,8 @@
 __pycache__/
-finances.db
 *.pyc
+finances.db
+.venv/
+.venv314/
+.env
+.vercel/
+app_log.txt

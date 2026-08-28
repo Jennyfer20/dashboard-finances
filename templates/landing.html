@@ -1,59 +1,596 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BudgetLab</title>
+    <title>BudgetLab - Gestion de finances et de paie</title>
+    <meta name="description" content="Suivez vos revenus et depenses, fixez des budgets par categorie, automatisez vos echeances et gerez la paie de votre equipe.">
+    <link rel="icon" href="/static/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/static/favicon.png" type="image/png">
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="/static/icon-192x192.png">
+    <meta name="theme-color" content="#2563eb">
+    <script src="/static/theme.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="landing-body">
+<body class="doc">
 
-    <nav class="landing-nav">
-        <span class="nav-logo">💰 BudgetLab</span>
-        <div class="nav-links">
-            <a href="/login" class="btn-outline">Connexion</a>
-            <a href="/register" class="btn-primary">S'inscrire</a>
+    <nav class="doc-nav">
+        <span class="nav-logo">
+            <span class="pastille-logo"><i data-lucide="wallet"></i></span>
+            BudgetLab
+        </span>
+        <div class="nav-actions">
+            <button class="btn-theme" data-bascule-theme aria-label="Changer de theme" aria-pressed="false"><i data-lucide="moon"></i></button>
+            <a href="/login" class="bouton btn-secondary">Se connecter</a>
+            <a href="/register" class="bouton btn-primary">Creer un compte</a>
         </div>
     </nav>
 
-    <div class="landing-content">
-
-        <h1 class="big-title">💰 BudgetLab</h1>
-
-        <div class="landing-features">
-            <div class="feature">
-                <div class="feature-icon">📊</div>
-                <h3>Tableau de bord</h3>
-                <p>Visualisez vos finances en un coup d'oeil avec des graphiques clairs.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔒</div>
-                <h3>Securise</h3>
-                <p>Vos donnees sont protegees et accessibles uniquement par vous.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📱</div>
-                <h3>Mobile</h3>
-                <p>Accessible sur telephone, tablette et ordinateur.</p>
-            </div>
+    <!-- ================================================== banniere ======= -->
+    <header class="hero">
+        <h1>Vos finances,<br><span class="accent">enfin sous controle</span></h1>
+        <p class="accroche">
+            Suivez vos revenus et vos depenses, fixez des budgets par categorie,
+            automatisez vos echeances mensuelles et gerez la paie de votre equipe.
+            Voici comment tout fonctionne.
+        </p>
+        <div class="nav-actions">
+            <a href="/register" class="bouton btn-primary"><i data-lucide="sparkles" class="icon-sm"></i> Commencer gratuitement</a>
+            <a href="#premiers-pas" class="bouton btn-secondary">Lire le guide</a>
         </div>
 
-        <div class="landing-cta">
-            <p>BudgetLab vous aide a suivre vos revenus, depenses et a atteindre vos objectifs financiers.</p>
-            <a href="/register" class="btn-primary btn-large">Commencer gratuitement</a>
+        <div class="chiffres-cles">
+            <div><strong>3</strong><span>types de transactions</span></div>
+            <div><strong>10</strong><span>devises disponibles</span></div>
+            <div><strong>2</strong><span>modes d'utilisation</span></div>
+            <div><strong>0</strong><span>franc a payer</span></div>
         </div>
 
+        <!-- Apercu de l'interface, dessine en HTML/CSS -->
+        <div class="apercu" aria-hidden="true">
+            <div class="apercu-barre">
+                <i style="background:#ef4444"></i><i style="background:#f59e0b"></i><i style="background:#10b981"></i>
+            </div>
+            <div class="apercu-corps">
+                <div class="apercu-menu">
+                    <span class="on">Tableau de bord</span>
+                    <span>Transactions</span>
+                    <span>Budgets</span>
+                    <span>Echeances</span>
+                    <span>Salaires</span>
+                </div>
+                <div class="apercu-vue">
+                    <div class="apercu-cartes">
+                        <div class="apercu-carte" style="border-top-color:#2563eb"><em>Revenus</em><b>9 250 000</b></div>
+                        <div class="apercu-carte" style="border-top-color:#ef4444"><em>Depenses</em><b>4 659 750</b></div>
+                        <div class="apercu-carte" style="border-top-color:#10b981"><em>Benefice</em><b>4 590 250</b></div>
+                    </div>
+                    <div class="apercu-graphe">
+                        <i style="height:45%;background:#3b82f6"></i>
+                        <i style="height:72%;background:#3b82f6"></i>
+                        <i style="height:38%;background:#ef4444"></i>
+                        <i style="height:88%;background:#3b82f6"></i>
+                        <i style="height:56%;background:#ef4444"></i>
+                        <i style="height:66%;background:#3b82f6"></i>
+                        <i style="height:34%;background:#ef4444"></i>
+                        <i style="height:78%;background:#3b82f6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="doc-layout">
+        <aside class="doc-sommaire">
+            <h4>Demarrer</h4>
+            <a href="#presentation">Presentation</a>
+            <a href="#premiers-pas">Premiers pas</a>
+            <a href="#modes">Personnel ou entreprise</a>
+
+            <h4>Finances</h4>
+            <a href="#transactions">Transactions</a>
+            <a href="#budgets">Budgets</a>
+            <a href="#echeances">Echeances recurrentes</a>
+            <a href="#recherche">Recherche et export</a>
+
+            <h4>Paie</h4>
+            <a href="#employes">Employes</a>
+            <a href="#salaires">Salaires et fiches</a>
+
+            <h4>Compte</h4>
+            <a href="#parametres">Parametres et devise</a>
+            <a href="#securite">Securite</a>
+            <a href="#administration">Administration</a>
+            <a href="#questions">Questions frequentes</a>
+        </aside>
+
+        <main class="doc-contenu">
+
+            <!-- ------------------------------------------- presentation -->
+            <section id="presentation">
+                <h2><span class="num">01</span> Presentation</h2>
+                <p class="chapeau">
+                    BudgetLab s'utilise depuis un navigateur, sur ordinateur comme sur telephone,
+                    et s'installe sur l'ecran d'accueil comme une application mobile.
+                </p>
+
+                <div class="grille-fonctions">
+                    <div class="carte-fonction">
+                        <div class="pastille bleu"><i data-lucide="arrow-left-right"></i></div>
+                        <h3>Transactions</h3>
+                        <p>Revenus, depenses et factures, avec filtres, recherche et export.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille vert"><i data-lucide="target"></i></div>
+                        <h3>Budgets</h3>
+                        <p>Un plafond mensuel par categorie, avec alerte de depassement.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille violet"><i data-lucide="repeat"></i></div>
+                        <h3>Echeances</h3>
+                        <p>Loyer et abonnements crees automatiquement chaque mois.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille orange"><i data-lucide="pie-chart"></i></div>
+                        <h3>Graphiques</h3>
+                        <p>Repartition des depenses et evolution mois par mois.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille rose"><i data-lucide="users"></i></div>
+                        <h3>Employes</h3>
+                        <p>Fichier du personnel par departement et salaire de base.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille rouge"><i data-lucide="file-text"></i></div>
+                        <h3>Fiches de paie</h3>
+                        <p>Generation mensuelle des salaires et bulletins en PDF.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- -------------------------------------------- premiers pas -->
+            <section id="premiers-pas">
+                <h2><span class="num">02</span> Premiers pas</h2>
+                <p class="chapeau">Quatre etapes suffisent pour un compte operationnel.</p>
+
+                <div class="frise">
+                    <div>
+                        <div class="rond">1</div>
+                        <h4>Creez le compte</h4>
+                        <p>Choisissez le mode personnel ou entreprise.</p>
+                    </div>
+                    <div>
+                        <div class="rond">2</div>
+                        <h4>Saisissez</h4>
+                        <p>Ajoutez vos premieres transactions.</p>
+                    </div>
+                    <div>
+                        <div class="rond">3</div>
+                        <h4>Budgetez</h4>
+                        <p>Fixez un plafond par categorie.</p>
+                    </div>
+                    <div>
+                        <div class="rond">4</div>
+                        <h4>Automatisez</h4>
+                        <p>Programmez ce qui revient chaque mois.</p>
+                    </div>
+                </div>
+
+                <div class="encart">
+                    <i data-lucide="lightbulb"></i>
+                    <p>
+                        Le tableau de bord se met a jour tout seul : chaque transaction ajoutee
+                        alimente immediatement les indicateurs, les graphiques et le suivi des budgets.
+                    </p>
+                </div>
+            </section>
+
+            <!-- -------------------------------------------------- modes -->
+            <section id="modes">
+                <h2><span class="num">03</span> Personnel ou entreprise</h2>
+                <p class="chapeau">
+                    Le mode choisi a l'inscription adapte l'interface. Il ne limite jamais vos
+                    donnees : seules les fonctionnalites affichees changent.
+                </p>
+
+                <div class="deux-colonnes">
+                    <div class="carte-mode">
+                        <h3><i data-lucide="user" class="icon-sm"></i> Personnel</h3>
+                        <p class="sous">Pour gerer son budget au quotidien</p>
+                        <ul>
+                            <li><i data-lucide="check"></i> Revenus et depenses</li>
+                            <li><i data-lucide="check"></i> Budgets par categorie</li>
+                            <li><i data-lucide="check"></i> Echeances recurrentes</li>
+                            <li><i data-lucide="check"></i> Solde, revenus, depenses</li>
+                            <li class="absent"><i data-lucide="minus"></i> Pas de gestion d'employes</li>
+                        </ul>
+                    </div>
+                    <div class="carte-mode mise-en-avant">
+                        <h3><i data-lucide="building-2" class="icon-sm"></i> Entreprise</h3>
+                        <p class="sous">Pour piloter une activite et sa paie</p>
+                        <ul>
+                            <li><i data-lucide="check"></i> Tout le mode personnel</li>
+                            <li><i data-lucide="check"></i> Factures clients</li>
+                            <li><i data-lucide="check"></i> Gestion des employes</li>
+                            <li><i data-lucide="check"></i> Salaires et fiches de paie</li>
+                            <li><i data-lucide="check"></i> Chiffre d'affaires, benefice, masse salariale</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ------------------------------------------- transactions -->
+            <section id="transactions">
+                <h2><span class="num">04</span> Transactions</h2>
+                <p class="chapeau">
+                    Chaque mouvement d'argent est une transaction : un type, une categorie,
+                    un montant et une description.
+                </p>
+
+                <div class="zone-tableau">
+                    <table class="tableau-doc">
+                        <thead><tr><th>Type</th><th>Usage</th><th>Disponibilite</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Revenu</strong></td><td>Salaire, vente, subvention</td><td>Tous les comptes</td></tr>
+                            <tr><td><strong>Depense</strong></td><td>Loyer, achat, frais</td><td>Tous les comptes</td></tr>
+                            <tr><td><strong>Facture client</strong></td><td>Prestation facturee</td><td>Mode entreprise</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Categories intelligentes</h3>
+                <p>
+                    La categorie est libre. BudgetLab reconnait celles deja utilisees quelle que
+                    soit la casse : si vous tapez <code>loyer</code> alors que <code>Loyer</code>
+                    existe, les deux sont regroupees. Vos graphiques et budgets restent coherents.
+                </p>
+            </section>
+
+            <!-- ------------------------------------------------ budgets -->
+            <section id="budgets">
+                <h2><span class="num">05</span> Budgets</h2>
+                <p class="chapeau">
+                    Un budget fixe un plafond mensuel pour une categorie de depenses. La barre
+                    change de couleur a mesure que vous consommez.
+                </p>
+
+                <div class="demo-budget">
+                    <div class="ligne">
+                        <div class="tete"><b>Transport</b><span style="color:#10b981">185 000 / 500 000</span></div>
+                        <div class="jauge"><i style="width:37%;background:#10b981"></i></div>
+                        <div class="note" style="color:#10b981">Reste 315 000 (37 %) &mdash; tout va bien</div>
+                    </div>
+                    <div class="ligne">
+                        <div class="tete"><b>Marketing</b><span style="color:#f59e0b">850 000 / 900 000</span></div>
+                        <div class="jauge"><i style="width:94%;background:#f59e0b"></i></div>
+                        <div class="note" style="color:#f59e0b">Reste 50 000 (94 %) &mdash; la limite approche</div>
+                    </div>
+                    <div class="ligne">
+                        <div class="tete"><b>Fournitures</b><span style="color:#ef4444">465 000 / 400 000</span></div>
+                        <div class="jauge"><i style="width:100%;background:#ef4444"></i></div>
+                        <div class="note" style="color:#ef4444">Depassement de 65 000 (116 %)</div>
+                    </div>
+                </div>
+
+                <div class="encart">
+                    <i data-lucide="info"></i>
+                    <p>
+                        Enregistrer un budget sur une categorie qui en possede deja un
+                        <strong>met a jour le plafond</strong> au lieu de creer un doublon.
+                        Le selecteur de mois permet de consulter un mois passe.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ---------------------------------------------- echeances -->
+            <section id="echeances">
+                <h2><span class="num">06</span> Echeances recurrentes</h2>
+                <p class="chapeau">
+                    Ne ressaisissez plus jamais votre loyer. Indiquez le montant et le jour du
+                    mois : la transaction est creee automatiquement.
+                </p>
+
+                <h3>Quand la transaction est-elle creee ?</h3>
+                <p>
+                    A l'ouverture de votre tableau de bord. BudgetLab verifie les echeances
+                    arrivees a terme et cree les transactions manquantes, avec un rattrapage sur
+                    les douze derniers mois au maximum. Une echeance n'est jamais generee deux
+                    fois pour le meme mois.
+                </p>
+
+                <div class="encart attention">
+                    <i data-lucide="alert-triangle"></i>
+                    <p>
+                        Une echeance creee aujourd'hui demarre <strong>au mois en cours</strong>.
+                        Elle ne genere pas d'historique retroactif sur les mois precedents.
+                    </p>
+                </div>
+
+                <h3>Mettre en pause plutot que supprimer</h3>
+                <p>
+                    Le bouton <strong>Mettre en pause</strong> suspend une echeance sans la
+                    supprimer ni toucher aux transactions deja creees. Reactivez-la quand vous
+                    le souhaitez.
+                </p>
+            </section>
+
+            <!-- ------------------------------------- recherche et export -->
+            <section id="recherche">
+                <h2><span class="num">07</span> Recherche et export</h2>
+                <p class="chapeau">
+                    Retrouvez n'importe quelle operation, puis emportez vos donnees.
+                </p>
+
+                <div class="grille-fonctions">
+                    <div class="carte-fonction">
+                        <div class="pastille bleu"><i data-lucide="filter"></i></div>
+                        <h3>Filtres</h3>
+                        <p>Par type, categorie et periode. Les resultats sont pagines par 25.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille violet"><i data-lucide="search"></i></div>
+                        <h3>Recherche</h3>
+                        <p>Sur la description et la categorie, sans distinction de majuscules.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille vert"><i data-lucide="download"></i></div>
+                        <h3>Export CSV</h3>
+                        <p>S'ouvre directement dans Excel, sans assistant d'importation.</p>
+                    </div>
+                </div>
+
+                <div class="encart">
+                    <i data-lucide="shield-check"></i>
+                    <p>L'export ne contient que <strong>vos</strong> transactions, jamais celles d'un autre compte.</p>
+                </div>
+            </section>
+
+            <!-- ----------------------------------------------- employes -->
+            <section id="employes">
+                <h2><span class="num">08</span> Employes</h2>
+                <p class="chapeau">Disponible en mode entreprise.</p>
+                <p>
+                    Enregistrez pour chaque employe son nom, son poste, son departement, son
+                    salaire de base et ses coordonnees.
+                </p>
+                <div class="encart">
+                    <i data-lucide="archive"></i>
+                    <p>
+                        Supprimer un employe le <strong>desactive</strong> : il disparait des listes
+                        et des generations a venir, mais ses fiches de paie passees restent
+                        consultables.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ----------------------------------------------- salaires -->
+            <section id="salaires">
+                <h2><span class="num">09</span> Salaires et fiches</h2>
+                <p class="chapeau">De la generation mensuelle au bulletin PDF, en quatre gestes.</p>
+
+                <div class="frise">
+                    <div>
+                        <div class="rond">1</div>
+                        <h4>Generer</h4>
+                        <p>Une fiche par employe actif, au salaire de base.</p>
+                    </div>
+                    <div>
+                        <div class="rond">2</div>
+                        <h4>Ajuster</h4>
+                        <p>Bonus et deductions, net recalcule en direct.</p>
+                    </div>
+                    <div>
+                        <div class="rond">3</div>
+                        <h4>Payer</h4>
+                        <p>Une fiche a la fois, ou tout le mois d'un coup.</p>
+                    </div>
+                    <div>
+                        <div class="rond">4</div>
+                        <h4>Editer</h4>
+                        <p>Le bulletin PDF, a la devise du compte.</p>
+                    </div>
+                </div>
+
+                <div class="encart">
+                    <i data-lucide="user-plus"></i>
+                    <p>
+                        Un employe arrive apres la generation ? Relancez <strong>Generer</strong>
+                        sur le meme mois : seules les fiches manquantes sont creees, sans doublon
+                        ni perte des ajustements deja saisis.
+                    </p>
+                </div>
+
+                <p>
+                    Les deductions ne peuvent pas depasser le salaire de base augmente du bonus :
+                    un net a payer negatif est refuse.
+                </p>
+            </section>
+
+            <!-- --------------------------------------------- parametres -->
+            <section id="parametres">
+                <h2><span class="num">10</span> Parametres et devise</h2>
+                <p class="chapeau">
+                    Modifiez votre nom, votre email, votre mot de passe et votre devise.
+                </p>
+                <p>
+                    Dix devises sont proposees : <code>FCFA</code>, <code>EUR</code>,
+                    <code>USD</code>, <code>GBP</code>, <code>CAD</code>, <code>CHF</code>,
+                    <code>MAD</code>, <code>TND</code>, <code>XOF</code> et <code>XAF</code>.
+                    Le changement s'applique partout : tableau de bord, listes, export CSV et
+                    fiches de paie.
+                </p>
+
+                <div class="encart attention">
+                    <i data-lucide="alert-triangle"></i>
+                    <p>
+                        Changer de devise modifie l'affichage, pas les montants :
+                        <strong>aucune conversion n'est effectuee</strong>. La suppression de compte,
+                        elle, efface definitivement toutes vos donnees. Exportez-les avant.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ----------------------------------------------- securite -->
+            <section id="securite">
+                <h2><span class="num">11</span> Securite</h2>
+                <p class="chapeau">Ce qui protege vos donnees financieres.</p>
+
+                <ul class="liste-securite">
+                    <li>
+                        <div class="pastille vert"><i data-lucide="key-round"></i></div>
+                        <div><strong>Mots de passe haches avec scrypt.</strong> Ils ne sont jamais
+                        stockes en clair et ne peuvent etre retrouves par personne, pas meme
+                        l'administrateur.</div>
+                    </li>
+                    <li>
+                        <div class="pastille bleu"><i data-lucide="lock"></i></div>
+                        <div><strong>Cloisonnement strict.</strong> Transactions, budgets, echeances,
+                        employes et fiches de paie ne sont accessibles qu'a leur proprietaire.</div>
+                    </li>
+                    <li>
+                        <div class="pastille orange"><i data-lucide="shield-alert"></i></div>
+                        <div><strong>Protection contre le forcage.</strong> Au-dela de dix tentatives
+                        de connexion echouees en quinze minutes, les essais sont bloques.</div>
+                    </li>
+                    <li>
+                        <div class="pastille violet"><i data-lucide="cookie"></i></div>
+                        <div><strong>Sessions securisees.</strong> Les cookies sont transmis
+                        uniquement en HTTPS en production et inaccessibles aux scripts.</div>
+                    </li>
+                    <li>
+                        <div class="pastille rose"><i data-lucide="code-2"></i></div>
+                        <div><strong>Contenu neutralise.</strong> Les donnees saisies sont echappees
+                        a l'affichage : aucun code ne peut s'executer dans le navigateur.</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- ------------------------------------------ administration -->
+            <section id="administration">
+                <h2><span class="num">12</span> Administration</h2>
+                <p class="chapeau">
+                    Reserve aux comptes administrateurs, accessible sur <code>/admin</code>.
+                </p>
+
+                <div class="grille-fonctions">
+                    <div class="carte-fonction">
+                        <div class="pastille bleu"><i data-lucide="bar-chart-3"></i></div>
+                        <h3>Vue d'ensemble</h3>
+                        <p>Statistiques globales et courbe des inscriptions.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille violet"><i data-lucide="users"></i></div>
+                        <h3>Comptes</h3>
+                        <p>Rechercher, suspendre, nommer administrateur ou supprimer.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille orange"><i data-lucide="shield-alert"></i></div>
+                        <h3>Securite</h3>
+                        <p>Echecs de connexion recents et deblocage d'une adresse.</p>
+                    </div>
+                    <div class="carte-fonction">
+                        <div class="pastille vert"><i data-lucide="scroll-text"></i></div>
+                        <h3>Journal</h3>
+                        <p>Trace horodatee de chaque action d'administration.</p>
+                    </div>
+                </div>
+
+                <div class="encart">
+                    <i data-lucide="eye-off"></i>
+                    <p>
+                        <strong>L'administrateur ne voit pas vos finances.</strong> Il gere les
+                        comptes et consulte des volumes, jamais le detail de vos montants, de vos
+                        budgets ou de vos fiches de paie.
+                    </p>
+                </div>
+
+                <div class="encart attention">
+                    <i data-lucide="alert-triangle"></i>
+                    <p>
+                        Un compte <strong>suspendu</strong> conserve toutes ses donnees mais ne peut
+                        plus se connecter. Une <strong>suppression</strong>, elle, est definitive.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ------------------------------------------------- questions -->
+            <section id="questions" class="faq">
+                <h2><span class="num">13</span> Questions frequentes</h2>
+
+                <details open>
+                    <summary>Puis-je utiliser BudgetLab sur telephone ?</summary>
+                    <div class="reponse"><p>
+                        Oui. L'interface s'adapte aux petits ecrans et l'application peut etre
+                        installee sur l'ecran d'accueil depuis le menu de votre navigateur.
+                    </p></div>
+                </details>
+                <details>
+                    <summary>Mes donnees suivent-elles si je change d'appareil ?</summary>
+                    <div class="reponse"><p>
+                        Oui, tout est enregistre sur le serveur. Connectez-vous depuis n'importe
+                        quel appareil pour retrouver votre compte a l'identique.
+                    </p></div>
+                </details>
+                <details>
+                    <summary>Comment recuperer mes donnees ?</summary>
+                    <div class="reponse"><p>
+                        Utilisez l'export CSV depuis l'onglet Transactions. Les fiches de paie
+                        s'exportent individuellement en PDF.
+                    </p></div>
+                </details>
+                <details>
+                    <summary>J'ai oublie mon mot de passe</summary>
+                    <div class="reponse"><p>
+                        La reinitialisation par email n'est pas encore disponible. Contactez
+                        l'administrateur de votre instance.
+                    </p></div>
+                </details>
+                <details>
+                    <summary>Puis-je changer de mode apres l'inscription ?</summary>
+                    <div class="reponse"><p>
+                        Le mode est defini a la creation du compte. Vos donnees existantes sont
+                        conservees quel que soit le mode : rien n'est perdu.
+                    </p></div>
+                </details>
+            </section>
+
+            <!-- ------------------------------------------------- appel -->
+            <section class="appel-action">
+                <h2>Pret a commencer ?</h2>
+                <p>Creez votre compte en quelques secondes et enregistrez votre premiere transaction.</p>
+                <div class="nav-actions" style="justify-content:center">
+                    <a href="/register" class="bouton btn-primary"><i data-lucide="arrow-right" class="icon-sm"></i> Creer mon compte</a>
+                    <a href="/login" class="bouton btn-secondary">J'ai deja un compte</a>
+                </div>
+            </section>
+
+        </main>
     </div>
-    <script>
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/static/sw.js");
-    }
-    </script>
 
+    <footer class="pied">
+        BudgetLab &mdash; Gestion de finances et de paie.
+        <a href="/login">Se connecter</a> &middot; <a href="/register">Creer un compte</a>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Met en evidence la section en cours de lecture dans le sommaire.
+        var liens = document.querySelectorAll(".doc-sommaire a");
+        var sections = document.querySelectorAll(".doc-contenu section[id]");
+        if ("IntersectionObserver" in window) {
+            var observateur = new IntersectionObserver(function (entrees) {
+                entrees.forEach(function (e) {
+                    if (!e.isIntersecting) return;
+                    liens.forEach(function (l) {
+                        l.classList.toggle("actif", l.getAttribute("href") === "#" + e.target.id);
+                    });
+                });
+            }, { rootMargin: "-92px 0px -68% 0px" });
+            sections.forEach(function (s) { observateur.observe(s); });
+        }
+    </script>
 </body>
 </html>

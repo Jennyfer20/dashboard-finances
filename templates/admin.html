@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetLab - Administration</title>
+    <link rel="icon" href="/static/favicon.png">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/theme.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <h2>BudgetLab</h2>
+        <span class="badge-admin"><i data-lucide="shield" class="icon-sm"></i> Administration</span>
+        <a href="#" class="active" onclick="changerVue('vue-stats', this)"><i data-lucide="bar-chart-3" class="icon"></i> Vue d'ensemble</a>
+        <a href="#" onclick="changerVue('vue-comptes', this)"><i data-lucide="users" class="icon"></i> Comptes</a>
+        <a href="#" onclick="changerVue('vue-securite', this)"><i data-lucide="shield-alert" class="icon"></i> Securite</a>
+        <a href="#" onclick="changerVue('vue-journal', this)"><i data-lucide="scroll-text" class="icon"></i> Journal</a>
+        <a href="/dashboard"><i data-lucide="arrow-left" class="icon"></i> Retour a l'application</a>
+        <a href="#" id="lien-logout" class="logout-link"><i data-lucide="log-out" class="icon"></i> Deconnexion</a>
+    </nav>
+
+    <div class="contenu">
+        <header class="entete-page">
+            <div style="display:flex;align-items:center;gap:12px">
+                <button id="btn-menu" aria-label="Ouvrir le menu"><i data-lucide="menu" class="icon"></i></button>
+                <h1 id="titre-page">Administration</h1>
+            </div>
+            <div class="actions-entete">
+                <button class="btn-theme" data-bascule-theme aria-label="Changer de theme" aria-pressed="false"><i data-lucide="moon"></i></button>
+                <button id="btn-actualiser" class="btn-secondary"><i data-lucide="refresh-cw" class="icon-sm"></i> Actualiser</button>
+            </div>
+        </header>
+
+        <div class="encart" style="margin-bottom:22px">
+            <i data-lucide="eye-off"></i>
+            <p>
+                Cet espace permet de gerer les comptes, jamais de consulter leur contenu.
+                Les montants, budgets et fiches de paie des utilisateurs restent prives :
+                seuls des volumes sont affiches.
+            </p>
+        </div>
+
+        <!-- ============================================ vue d'ensemble -->
+        <div id="vue-stats" class="page">
+            <div class="cartes" id="cartes-stats"></div>
+            <div class="bloc">
+                <h3>Inscriptions des 30 derniers jours</h3>
+                <div id="graphe-inscriptions" class="histogramme"></div>
+            </div>
+        </div>
+
+        <!-- =================================================== comptes -->
+        <div id="vue-comptes" class="page" style="display:none">
+            <div class="filtres">
+                <input type="text" id="recherche-compte" placeholder="Rechercher un nom ou un email...">
+                <button id="btn-chercher" class="btn-primary"><i data-lucide="search" class="icon-sm"></i> Rechercher</button>
+                <button id="btn-vider-recherche" class="btn-secondary">Reinitialiser</button>
+            </div>
+            <div class="bloc">
+                <h3>Comptes <span id="total-comptes" style="font-weight:400;color:var(--texte-faible);font-size:.88rem"></span></h3>
+                <div id="liste-comptes" class="etat-vide">Chargement...</div>
+            </div>
+        </div>
+
+        <!-- ================================================== securite -->
+        <div id="vue-securite" class="page" style="display:none">
+            <div class="bloc">
+                <h3>Echecs de connexion recents</h3>
+                <p style="color:var(--texte-doux);font-size:.88rem;margin:-6px 0 14px">
+                    Au-dela de 10 essais en 15 minutes, l'adresse est bloquee. Debloquez-la si
+                    l'utilisateur a simplement oublie son mot de passe.
+                </p>
+                <div id="liste-securite" class="etat-vide">Chargement...</div>
+            </div>
+        </div>
+
+        <!-- =================================================== journal -->
+        <div id="vue-journal" class="page" style="display:none">
+            <div class="bloc">
+                <h3>Journal des actions d'administration</h3>
+                <p style="color:var(--texte-doux);font-size:.88rem;margin:-6px 0 14px">
+                    Les 100 dernieres actions. Chaque suspension, suppression ou changement de
+                    role laisse une trace horodatee.
+                </p>
+                <div id="liste-journal" class="etat-vide">Chargement...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/admin.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
